@@ -1,0 +1,12 @@
+{
+  "name": "Twilight ESP",
+  "tree": {
+    "$className": "DataModel",
+
+    "ReplicatedStorage": {
+      "Twilight ESP": {
+        "$path": "src"
+      }
+    }
+  }
+}
