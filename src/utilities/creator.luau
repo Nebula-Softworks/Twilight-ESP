@@ -1,7 +1,6 @@
 local Creator = {
 	Registry = {},
 	Signals = {},
-	TransparencyMotors = {},
 	DefaultProperties = {
 		ScreenGui = {
 			ResetOnSpawn = false,

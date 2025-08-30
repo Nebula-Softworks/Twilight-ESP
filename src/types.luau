@@ -1,8 +1,17 @@
 export type Twilight = {
-	espObjects: {}?,
+	espObjects: {
+		Players: {},
+	},
 	settings: twilightSettings,
-	Instance: Instance,
+	Instance: {
+		PlayerESPs: {
+			PlayerESPTracers: {},
+		},
+		Tracers: {},
+	},
+	espInstance: any,
 	_connections: {},
+	unloaded: boolean,
 }
 
 export type twilightTheme = {
@@ -20,10 +29,12 @@ export type twilightTheme = {
 	highlightFillEnemy: Color3,
 	highlightFillTeam: Color3,
 	highlightFillSelf: Color3,
-	HighlightOutline: Color3,
+	highlightOutline: Color3,
 
-	healthBarStroke: Color3?,
 	healthBarFillNeutral: Color3,
+	healthBarFillNeutralLow: Color3,
+	healthBarFillSelf: Color3,
+	healthBarFillSelfLow: Color3,
 	healthBarFillTeam: Color3?,
 	healthBarFillEnemy: Color3?,
 	healthBarFillTeamLow: Color3,
@@ -37,16 +48,20 @@ export type twilightSettings = {
 	boxEnabled: boolean,
 	outlineBoxEnabled: boolean?,
 	boxTeamCheck: boolean,
+	outlineBoxTeamCheck: boolean,
 	chamsEnabled: boolean,
 	chamsTeamCheck: boolean,
+	tracersEnabled: boolean,
 
 	useTeamColor: boolean?, -- sets the esp colors to be based off teams
-	limitDistance: number? | boolean,
+	limitDistance: number | boolean,
 	lowHealthAlert: boolean?,
+	showObjectNames: boolean?,
 
 	teamEnabled: boolean,
 	enemyEnabled: boolean,
-	selfEnabled: boolean?,
+	selfEnabled: boolean,
+	neutralEnabled: boolean,
 }
 
 export type cham = {
@@ -64,6 +79,8 @@ export type healthbar = {
 export type espObject = {
 	chams: cham,
 	espBox: box,
+	tracer: Instance,
+	healthbar: healthbar,
 }
 
 export type playerEsp = {

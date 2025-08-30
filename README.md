@@ -1,5 +1,5 @@
 # Twilight ESP Library
-![Image](/assets/Twilight%20Cover%20Image.png)
+![Image](https://github.com/Nebula-Softworks/Twilight-ESP/blob/master/assets/Twilight%20Cover%20Image.png?raw=true)
 
 ### The Pitch
 Twilight, the extrasenory star.

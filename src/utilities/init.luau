@@ -5,7 +5,7 @@ local utility = {}
 
 --// Initialize
 
-utility.ProtectUI = function(gui: Instance): ScreenGui
+function utility.ProtectUI(gui: Instance): ScreenGui
 	local success = nil
 	local returned = false
 
