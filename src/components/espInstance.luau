@@ -64,7 +64,7 @@ function espInstance:Create(object, partRoot)
 		--[[root.settings.currentColors.highlightFillNeutral or ]]
 		FillColor = Color3.new(1, 1, 1),
 		--OutlineColor = root.settings.currentColors.highlightOutline,
-		Parent = root.settings.chamsEnabled and object,
+		Parent = root.settings.chamsEnabled and object or nil,
 	})
 	local tracer = creator.New("Frame", {
 		Name = object.Name .. "_Tracer",
