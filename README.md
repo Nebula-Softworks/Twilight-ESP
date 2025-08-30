@@ -1,7 +1,7 @@
 # Twilight ESP Library
 ![Image](https://github.com/Nebula-Softworks/Twilight-ESP/blob/master/assets/Twilight%20Cover%20Image.png?raw=true)
 
-> [note]
+> [!note]  
 > this readme is a stud. you can help us by forking the repo and improving this readme. this will be fixed and made nicer soon
 
 ### The Pitch
