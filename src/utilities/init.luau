@@ -5,31 +5,35 @@ local utility = {}
 
 --// Initialize
 
-function utility.ProtectUI(gui: Instance): ScreenGui
-	local success = nil
-	local returned = false
-
+function utility.ProtectUI(gui)
 	if gethui then
 		gui.Parent = gethui()
+		return gethui()
 	elseif syn and syn.protect_gui then
 		syn.protect_gui(gui)
-
-		gui.Parent = services.CoreGui
+		return services.CoreGui
 	elseif not services.RunService:IsStudio() and services.CoreGui:FindFirstChild("RobloxGui") then
 		gui.Parent = services.CoreGui:FindFirstChild("RobloxGui")
+		return services.CoreGui:FindFirstChild("RobloxGui")
 	else
-		success = false
-
 		if not services.RunService:IsStudio() then
 			gui.Parent = services.CoreGui
-			returned = "No Protection Methods Available."
+			return services.CoreGui
 		else
 			gui.Parent = services.Players.LocalPlayer.PlayerGui
-			returned = "Environment invalid - isStudio"
+			return services.Players.LocalPlayer.PlayerGui
 		end
 	end
+end
 
-	return success and gui or returned
+function utility.Kwargify(array, defaults)
+	array = array or {}
+	for defaultprop, defaultvalue in pairs(defaults) do
+		if array[defaultprop] == nil then
+			array[defaultprop] = defaultvalue
+		end
+	end
+	return array
 end
 
 return utility
