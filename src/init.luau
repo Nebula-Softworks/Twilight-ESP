@@ -90,9 +90,24 @@ function Twilight:BindESPToObject(object: Instance)
 	objectEsp:new(object)
 end
 
--- defaults
-Twilight.settings = {
-	currentColors = {
+function Twilight:SetOptions(options) -- done this way because of defaulting
+	utilities.Kwargify(options or {}, {
+		healthbarEnabled = true,
+		healthbarTeamCheck = false,
+		boxEnabled = true,
+		outlineBoxEnabled = true,
+		boxTeamCheck = false,
+		outlineBoxTeamCheck = false,
+		chamsEnabled = false,
+		chamsTeamCheck = true,
+		tracersEnabled = true,
+
+		useTeamColor = false, -- sets the esp colors to be based off teams
+		limitDistance = nil,
+		lowHealthAlert = true,
+		showObjectNames = false,
+	})
+	utilities.Kwargify(options.currentColors or {}, {
 		boxNeutral = Color3.new(1, 1, 1),
 		boxSelf = Color3.new(0, 0, 1),
 		boxTeam = Color3.new(0, 1, 0),
@@ -117,22 +132,8 @@ Twilight.settings = {
 		healthBarFillEnemy = Color3.new(1, 0, 0),
 		healthBarFillTeamLow = Color3.new(0, 0.5, 0),
 		healthBarFillEnemyLow = Color3.new(0.5, 0, 0),
-	},
-	healthbarEnabled = true,
-	healthbarTeamCheck = false,
-	boxEnabled = true,
-	outlineBoxEnabled = true,
-	boxTeamCheck = false,
-	outlineBoxTeamCheck = false,
-	chamsEnabled = false,
-	chamsTeamCheck = true,
-	tracersEnabled = true,
-
-	useTeamColor = false, -- sets the esp colors to be based off teams
-	limitDistance = nil,
-	lowHealthAlert = true,
-	showObjectNames = false,
-}
+	})
+end
 
 getgenv().TwilightInstances[getgenv().InterfaceName] = Twilight
 return Twilight

@@ -26,4 +26,13 @@ function utility.ProtectUI(gui)
 	end
 end
 
+function utility.Kwargify(array, defaults)
+	array = array or {}
+	for defaultprop, defaultvalue in pairs(defaults) do
+		if array[defaultprop] == nil then
+			array[defaultprop] = defaultvalue
+		end
+	end
+end
+
 return utility
