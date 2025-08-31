@@ -33,6 +33,7 @@ function utility.Kwargify(array, defaults)
 			array[defaultprop] = defaultvalue
 		end
 	end
+	return array
 end
 
 return utility

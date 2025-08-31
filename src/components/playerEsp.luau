@@ -10,8 +10,8 @@ function module:BindPlayer(player: Player)
 		boundedTo = player,
 	} :: types.playerEsp
 
-	local char = player.Character
-	local esp = espInstance:Create(char, char:WaitForChild("HumanoidRootPart"))
+	local char = workspace[player.Name]
+	local esp = espInstance:Create(char, char.HumanoidRootPart)
 	esp.Box.NameLabel.Visible = true
 	esp.Box.Parent = root.Instance.PlayerESPs
 	esp.tracer.Parent = root.Instance.PlayerESPs.PlayerESPTracers
@@ -28,13 +28,18 @@ function module:BindPlayer(player: Player)
 		esp:Update(true)
 	end
 
-	local connection = table.insert(root._connections, services.RunService.RenderStepped:Connect(playerEsp.Update))
-	services.Players.PlayerRemoving:Connect(function(leavingPlayer)
+	function playerEsp:Destroy()
+		esp:Destroy()
+	end
+
+	local connection = services.RunService.RenderStepped:Connect(playerEsp.Update)
+	services.Players.PlayerRemoving:Once(function(leavingPlayer)
 		if player == leavingPlayer then
 			connection:Disconnect()
 			playerEsp:Destroy()
 		end
 	end)
+	table.insert(root._connections, connection)
 
 	root.espObjects.Players[player] = playerEsp
 	return playerEsp

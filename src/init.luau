@@ -5,6 +5,10 @@ local creator = require(script.utilities.creator)
 local playerEsp = require(script.components.playerEsp)
 local objectEsp = require(script.components.objectEsp)
 
+if getgenv().TwilightInstances == nil then
+	getgenv().TwilightInstances = {}
+end
+
 if getgenv().TwilightInstances[getgenv().InterfaceName] then
 	getgenv().TwilightInstances[getgenv().InterfaceName].Unload(true)
 end
@@ -91,7 +95,34 @@ function Twilight:BindESPToObject(object: Instance)
 end
 
 function Twilight:SetOptions(options) -- done this way because of defaulting
-	utilities.Kwargify(options or {}, {
+	options = options or {}
+	Twilight.settings = utilities.Kwargify(options, {
+		currentColors = utilities.Kwargify(options.currentColors or {}, {
+			boxNeutral = Color3.new(1, 1, 1),
+			boxSelf = Color3.new(0, 0, 1),
+			boxTeam = Color3.new(0, 1, 0),
+			boxEnemy = Color3.new(1, 0, 0),
+
+			boxOutlineNeutral = Color3.new(1, 1, 1),
+			boxOutlineSelf = Color3.new(0, 0, 1),
+			boxOutlineTeam = Color3.new(0, 1, 0),
+			boxOutlineEnemy = Color3.new(1, 0, 0),
+
+			highlightFillNeutral = Color3.new(1, 1, 1),
+			highlightFillEnemy = Color3.new(1, 0, 0),
+			highlightFillTeam = Color3.new(0, 1, 0),
+			highlightFillSelf = Color3.new(0, 0, 1),
+			highlightOutline = Color3.new(1, 1, 1),
+
+			healthBarFillNeutral = Color3.new(1, 1, 1),
+			healthBarFillNeutralLow = Color3.new(0.7, 0.7, 0.7),
+			healthBarFillSelf = Color3.new(0, 0, 1),
+			healthBarFillSelfLow = Color3.new(0, 0, 0.5),
+			healthBarFillTeam = Color3.new(0, 1, 0),
+			healthBarFillEnemy = Color3.new(1, 0, 0),
+			healthBarFillTeamLow = Color3.new(0, 0.5, 0),
+			healthBarFillEnemyLow = Color3.new(0.5, 0, 0),
+		}),
 		healthbarEnabled = true,
 		healthbarTeamCheck = false,
 		boxEnabled = true,
@@ -107,33 +138,8 @@ function Twilight:SetOptions(options) -- done this way because of defaulting
 		lowHealthAlert = true,
 		showObjectNames = false,
 	})
-	utilities.Kwargify(options.currentColors or {}, {
-		boxNeutral = Color3.new(1, 1, 1),
-		boxSelf = Color3.new(0, 0, 1),
-		boxTeam = Color3.new(0, 1, 0),
-		boxEnemy = Color3.new(1, 0, 0),
-
-		boxOutlineNeutral = Color3.new(1, 1, 1),
-		boxOutlineSelf = Color3.new(0, 0, 1),
-		boxOutlineTeam = Color3.new(0, 1, 0),
-		boxOutlineEnemy = Color3.new(1, 0, 0),
-
-		highlightFillNeutral = Color3.new(1, 1, 1),
-		highlightFillEnemy = Color3.new(0, 0, 1),
-		highlightFillTeam = Color3.new(0, 0, 1),
-		highlightFillSelf = Color3.new(0, 0, 1),
-		highlightOutline = Color3.new(1, 1, 1),
-
-		healthBarFillNeutral = Color3.new(1, 1, 1),
-		healthBarFillNeutralLow = Color3.new(0.7, 0.7, 0.7),
-		healthBarFillSelf = Color3.new(0, 0, 1),
-		healthBarFillSelfLow = Color3.new(0, 0, 0.5),
-		healthBarFillTeam = Color3.new(0, 1, 0),
-		healthBarFillEnemy = Color3.new(1, 0, 0),
-		healthBarFillTeamLow = Color3.new(0, 0.5, 0),
-		healthBarFillEnemyLow = Color3.new(0.5, 0, 0),
-	})
 end
 
+Twilight:SetOptions()
 getgenv().TwilightInstances[getgenv().InterfaceName] = Twilight
 return Twilight

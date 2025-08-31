@@ -111,15 +111,16 @@ function espInstance:Create(object, partRoot)
 	partRoot = partRoot or object
 
 	function espObject:Update(isPlayer)
+		root.settings.currentColors = root.settings.currentColors or {} :: types.twilightTheme
 		local colors = {
-			cham = root.settings.currentColors.highlightFillNeutral,
-			chamOutline = root.settings.currentColors.highlightOutline,
+			cham = root.settings.currentColors.highlightFillNeutral or Color3.new(0, 0, 0),
+			chamOutline = root.settings.currentColors.highlightOutline or Color3.new(0, 0, 0),
 
-			healthbar = root.settings.currentColors.healthBarFillNeutral,
-			healthbarlow = root.settings.currentColors.healthBarFillNeutralLow,
+			healthbar = root.settings.currentColors.healthBarFillNeutral or Color3.new(0, 0, 0),
+			healthbarlow = root.settings.currentColors.healthBarFillNeutralLow or Color3.new(0, 0, 0),
 
-			box = root.settings.currentColors.boxNeutral,
-			boxoutline = root.settings.currentColors.boxOutlineNeutral,
+			box = root.settings.currentColors.boxNeutral or Color3.new(0, 0, 0),
+			boxoutline = root.settings.currentColors.boxOutlineNeutral or Color3.new(0, 0, 0),
 		}
 
 		isPlayer = isPlayer or false
@@ -191,11 +192,6 @@ function espInstance:Create(object, partRoot)
 		if root.unloaded then
 			cham.Enabled = false
 			cham.Parent = nil
-		end
-		if object:FindFirstChild("Humanoid") and root.settings.healthbarEnabled then
-			healthBar.Visible = true
-		else
-			healthBar.Visible = false
 		end
 
 		local minX, minY = math.huge, math.huge
@@ -316,7 +312,7 @@ function espInstance:Create(object, partRoot)
 			tracer.Visible = false
 		end
 
-		if object:FindFirstChild("Humanoid") then
+		if object:FindFirstChild("Humanoid") and root.settings.healthbarEnabled then
 			healthBarFill.Size = UDim2.fromScale(object.Humanoid.Health / object.Humanoid.MaxHealth, 1)
 			if (object.Humanoid.Health / object.Humanoid.MaxHealth) > 32 / 100 then
 				--healthBarFill.BackgroundColor3 = root.settings.currentColors.HealthBarFillNeutral
@@ -324,6 +320,8 @@ function espInstance:Create(object, partRoot)
 			elseif root.settings.lowHealthAlert then
 				healthBarFill.BackgroundColor3 = colors.healthbarlow
 			end
+		else
+			healthBar.Visible = false
 		end
 
 		tracer.BackgroundColor3 = colors.boxoutline

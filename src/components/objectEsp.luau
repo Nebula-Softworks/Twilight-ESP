@@ -24,11 +24,16 @@ function module:new(object)
 		esp:Update()
 	end
 
-	local connection = table.insert(root._connections, services.RunService.RenderStepped:Connect(objectEsp.Update))
+	function objectEsp:Destroy()
+		esp:Destroy()
+	end
+
+	local connection = services.RunService.RenderStepped:Once(objectEsp.Update)
 	object.Destroying:Connect(function()
 		connection:Disconnect()
 		objectEsp:Destroy()
 	end)
+	table.insert(root._connections, connection)
 
 	root.espObjects[object] = objectEsp
 	return objectEsp
