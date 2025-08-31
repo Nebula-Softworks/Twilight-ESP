@@ -1,3 +1,4 @@
+local services = require(script.Parent.Parent.utilities.services)
 local espInstance = require(script.Parent.espInstance)
 local types = require(script.Parent.Parent.types)
 local root = require(script.Parent.Parent.contract)
@@ -23,8 +24,11 @@ function module:new(object)
 		esp:Update()
 	end
 
-	table.insert(root._connections, object.Changed:Connect(objectEsp.Update))
-	table.insert(root._connections, workspace.CurrentCamera.Changed:Connect(objectEsp.Update))
+	local connection = table.insert(root._connections, services.RunService.RenderStepped:Connect(objectEsp.Update))
+	object.Destroying:Connect(function()
+		connection:Disconnect()
+		objectEsp:Destroy()
+	end)
 
 	root.espObjects[object] = objectEsp
 	return objectEsp

@@ -64,7 +64,7 @@ function espInstance:Create(object, partRoot)
 		--[[root.settings.currentColors.highlightFillNeutral or ]]
 		FillColor = Color3.new(1, 1, 1),
 		--OutlineColor = root.settings.currentColors.highlightOutline,
-		Parent = root.settings.chamsEnabled and object,
+		Parent = root.settings.chamsEnabled and object or nil,
 	})
 	local tracer = creator.New("Frame", {
 		Name = object.Name .. "_Tracer",
@@ -331,6 +331,14 @@ function espInstance:Create(object, partRoot)
 		cornerBoxes.ImageColor3 = colors.box
 		cham.FillColor = colors.cham
 		cham.OutlineColor = colors.chamOutline
+	end
+
+	function espObject:Destroy()
+		container:Destroy()
+		cham:Destroy()
+		tracer:Destroy()
+
+		function espObject:Update() end
 	end
 
 	return espObject

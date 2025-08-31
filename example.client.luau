@@ -16,6 +16,6 @@ twilight.settings.useTeamColor = true
 
 require(game.ReplicatedStorage["Twilight ESP"]):BindESPToObject(workspace.trees:FindFirstChild("Cherry Blossom M"))
 
-wait(5)
+task.wait(5)
 
 --twilight.Unload()

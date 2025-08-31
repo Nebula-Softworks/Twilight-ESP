@@ -28,9 +28,13 @@ function module:BindPlayer(player: Player)
 		esp:Update(true)
 	end
 
-	table.insert(root._connections, player.Changed:Connect(playerEsp.Update))
-	table.insert(root._connections, char.Changed:Connect(playerEsp.Update))
-	table.insert(root._connections, workspace.CurrentCamera.Changed:Connect(playerEsp.Update))
+	local connection = table.insert(root._connections, services.RunService.RenderStepped:Connect(playerEsp.Update))
+	services.Players.PlayerRemoving:Connect(function(leavingPlayer)
+		if player == leavingPlayer then
+			connection:Disconnect()
+			playerEsp:Destroy()
+		end
+	end)
 
 	root.espObjects.Players[player] = playerEsp
 	return playerEsp

@@ -5,7 +5,11 @@ local creator = require(script.utilities.creator)
 local playerEsp = require(script.components.playerEsp)
 local objectEsp = require(script.components.objectEsp)
 
-local gui = creator.New("ScreenGui", { Name = "Twilight ESP", Enabled = false })
+if getgenv().TwilightInstances[getgenv().InterfaceName] then
+	getgenv().TwilightInstances[getgenv().InterfaceName].Unload(true)
+end
+
+local gui = creator.New("ScreenGui", { Name = "Twilight ESP " .. (getgenv().InterfaceName or ""), Enabled = false })
 utilities.ProtectUI(gui)
 
 creator.New("Frame", {
@@ -130,4 +134,5 @@ Twilight.settings = {
 	showObjectNames = false,
 }
 
+getgenv().TwilightInstances[getgenv().InterfaceName] = Twilight
 return Twilight
