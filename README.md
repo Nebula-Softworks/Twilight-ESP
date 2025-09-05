@@ -11,4 +11,5 @@ So Start using Twilight, the extrasensory star, today.
 ![preview](https://docs.nebulasoftworks.xyz/img/twilight/Twilight.png)
 ![preview2](https://docs.nebulasoftworks.xyz/img/twilight/config.png)
   
-### [Documentation](https://docs.nebulasoftworks.xyz/twilight)
+### [Documentation](https://docs.nebulasoftworks.xyz/twilight)  
+> Copyright © 2025 Nebula Softworks. All rights reserved.
