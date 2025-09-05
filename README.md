@@ -1,9 +1,6 @@
 # Twilight ESP Library
 ![Image](https://github.com/Nebula-Softworks/Twilight-ESP/blob/master/assets/Twilight%20Cover%20Image.png?raw=true)
 
-> [!note]  
-> this readme is a stud. you can help us by forking the repo and improving this readme. this will be fixed and made nicer soon
-
 ### The Pitch
 Twilight, the extrasenory star.  
 Twilight was made as to provide a beautiful and sexy ESP Library that met the new standard of 'looking nice' while maintaining an easy to use and bloat-free API for developers to use. Packed with full customisability, Twilight is open-sourced too! Why Twilight?  
