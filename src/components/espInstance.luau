@@ -39,7 +39,7 @@ function espInstance:Create(object, partRoot)
 		--Image = "rbxassetid://85554062016173",
 		--SliceCenter = Rect.new(142, 156, 861, 861),
 		-- SliceScale = 0.32,
-		Image = "rbxassetid://120285876115168",
+		Image = "rbxassetid://85948850855874", -- rbxassetid://120285876115168
 		ScaleType = Enum.ScaleType.Slice,
 		SliceCenter = Rect.new(271, 271, 746, 759),
 		SliceScale = 0.22,
@@ -47,7 +47,7 @@ function espInstance:Create(object, partRoot)
 		Parent = boxContainer,
 	})
 	local boxFrame = creator.New("Frame", {
-		Size = UDim2.new(1, -70, 1, -70),
+		Size = UDim2.new(1, -68, 1, -68),
 		Position = UDim2.fromScale(0.5, 0.5),
 		AnchorPoint = Vector2.new(0.5, 0.5),
 		Parent = boxContainer,
