@@ -41,12 +41,8 @@ local Twilight = {
 						Invisible = Color3.new(1, 1, 1),
 					},
 				},
-				CornerBox = {
-					Visible = Color3.new(1, 1, 1),
-					Invisible = Color3.new(1, 1, 1),
-				},
 
-				healthBar = {
+				HealthBar = {
 					Outline = Color3.new(1, 1, 1),
 					Fills = {
 						Low = Color3.new(1, 1, 1),
@@ -88,10 +84,6 @@ local Twilight = {
 						Visible = Color3.new(1, 1, 1),
 						Invisible = Color3.new(1, 1, 1),
 					},
-				},
-				CornerBox = {
-					Visible = Color3.new(1, 1, 1),
-					Invisible = Color3.new(1, 1, 1),
 				},
 
 				healthBar = {
@@ -137,10 +129,6 @@ local Twilight = {
 						Invisible = Color3.new(1, 1, 1),
 					},
 				},
-				CornerBox = {
-					Visible = Color3.new(1, 1, 1),
-					Invisible = Color3.new(1, 1, 1),
-				},
 
 				healthBar = {
 					Outline = Color3.new(1, 1, 1),
@@ -185,10 +173,6 @@ local Twilight = {
 						Invisible = Color3.new(1, 1, 1),
 					},
 				},
-				CornerBox = {
-					Visible = Color3.new(1, 1, 1),
-					Invisible = Color3.new(1, 1, 1),
-				},
 
 				healthBar = {
 					Outline = Color3.new(1, 1, 1),
@@ -224,7 +208,7 @@ local Twilight = {
 			},
 		},
 
-		healthBarSettings = {
+		HealthBar = {
 			Enabled = {
 				enemy = false,
 				friendly = false,
@@ -234,24 +218,19 @@ local Twilight = {
 
 			Bar = false,
 			Text = false,
-			MaxHealthEnabled = false,
 
 			Position = 1, -- 1 - left, 2 - right
 			Suffix = "HP",
 		},
 
-		Style = 1, -- 1 Normal, 2 3D
 		Box = {
+			Style = 1, -- 1 Corners, 2 Box, 3 3D, maybe in future ill add quad (oriented box)
 			Enabled = false,
 			Filled = {
 				Enabled = false,
 				Transparency = 0.6,
 			},
 			Thickness = 1,
-		},
-		CornerBox = {
-			Enabled = false,
-			Thickness = 3,
 		},
 
 		Tracer = {
@@ -273,7 +252,7 @@ local Twilight = {
 				generic = false,
 			},
 
-			Style = 1, -- 1 Display Name, 2 User Name, 3 Both
+			Style = 1, -- 1 Display Name, 2 User Name
 		},
 		Distance = {
 			Enabled = {
@@ -298,10 +277,9 @@ local Twilight = {
 				Transparency = 0,
 			},
 			Fill = {
-                Enabled = true,
-                Transparency = 0.5
-            },
-			OutlineThickness = 0.1,
+				Enabled = true,
+				Transparency = 0.5,
+			},
 			Occlusion = false,
 		},
 
@@ -318,8 +296,8 @@ local Twilight = {
 		},
 
 		TextSize = 14,
-		MaxDistance = 2000,
-		RefreshRate = 1 / 240,
+		MaxDistance = 2000, -- studs
+		RefreshRate = 1 / 120,
 
 		Snaplines = true,
 	},
@@ -333,26 +311,98 @@ local Twilight = {
 		Distances = {},
 		Snaplines = {},
 		Skeleton = {},
+
+		ObjectESPs = {},
 	},
 	Highlights = {},
 
 	_connections = {},
 }
 
-function Twilight.CleanupESP()
-	for _, player in ipairs(Players:GetPlayers()) do
-		playerEsp:RemoveESP(Twilight, player)
-	end
-	Twilight.Drawings.ESP = {}
-	Twilight.Drawings.Skeleton = {}
-	Twilight.Highlights = {}
-end
-
 function Twilight:Load() end
 
-function Twilight:Unload(destroy) end
+function Twilight:Unload(destroy)
+	if destroy then
+		for _, player in ipairs(Players:GetPlayers()) do
+			playerEsp:RemoveESP(Twilight, player)
+		end
+		Twilight.Drawings.ESP = {}
+		Twilight.Drawings.Skeleton = {}
+		Twilight.Highlights = {}
+		for _, connection in pairs(Twilight._connections) do
+			connection:Disconnect()
+			connection = nil
+		end
+	else
+		for _, player in ipairs(Players:GetPlayers()) do
+			local esp = Twilight.Drawings.ESP[player]
+			if esp then
+				for _, obj in pairs(esp.Box) do
+					obj.Visible = false
+				end
+				esp.Tracer.Visible = false
+				for _, obj in pairs(esp.HealthBar) do
+					obj.Visible = false
+				end
+				for _, obj in pairs(esp.Info) do
+					obj.Visible = false
+				end
+				esp.Snapline.Visible = false
+			end
+
+			-- Also hide skeleton
+			local skeleton = Twilight.Drawings.Skeleton[player]
+			if skeleton then
+				for _, line in pairs(skeleton) do
+					line.Visible = false
+				end
+			end
+		end
+	end
+end
 
 function Twilight:BindESPToObject(object, rootPart) end
+
+local lastUpdate = 0
+table.insert(
+	Twilight._connections,
+	RunService.RenderStepped:Connect(function()
+		if not Twilight.Settings.Enabled then
+			Twilight:Unload(false)
+			return
+		end
+
+		local currentTime = tick()
+		if currentTime - lastUpdate >= Twilight.Settings.RefreshRate then
+			for _, player in ipairs(Players:GetPlayers()) do
+				if player ~= LocalPlayer then
+					if not Twilight.Drawings.ESP[player] then
+						playerEsp:CreateESP(Twilight, player)
+					end
+					playerEsp:UpdateESP(Twilight, player)
+				end
+			end
+			lastUpdate = currentTime
+		end
+	end)
+)
+
+table.insert(
+	Twilight._connections,
+	Players.PlayerAdded:Connect(function(player)
+		playerEsp:CreateESP(Twilight, player)
+	end)
+)
+table.insert(
+	Twilight._connections,
+	Players.PlayerRemoving:Connect(function(player)
+		playerEsp:RemoveESP(Twilight, player)
+	end)
+)
+
+for _, player in ipairs(Players:GetPlayers()) do
+	playerEsp:CreateESP(Twilight, player)
+end
 
 function Twilight:EnablePlayerESP() end
 

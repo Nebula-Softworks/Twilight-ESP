@@ -15,6 +15,10 @@
 	  "remove_types",
 	  "remove_comments",
 	  "group_local_assignment",
-	  "remove_spaces"
+	  "remove_spaces",
+	  {
+		"rule": "append_text_comment",
+		"file": "./header.lua"
+	  }
 	]
   }
