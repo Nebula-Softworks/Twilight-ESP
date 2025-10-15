@@ -5,7 +5,13 @@
 
     "ReplicatedStorage": {
       "Twilight ESP": {
-        "$path": "src"
+        "$path" : "src"
+      }
+    },
+    
+    "StarterGui": {
+      "Twilight Test": {
+        "$path": "example.client.luau"
       }
     }
   }

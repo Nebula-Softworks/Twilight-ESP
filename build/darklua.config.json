@@ -1,0 +1,20 @@
+{
+	"bundle": {
+	  "require_mode": {
+		"name" : "luau",
+		"aliases": {
+			"@root": "../src"
+		 }
+	   }
+	},
+	"rules": [
+	  "compute_expression",
+	  "rename_variables",
+	  "remove_unused_if_branch",
+	  "remove_unused_while",
+	  "remove_types",
+	  "remove_comments",
+	  "group_local_assignment",
+	  "remove_spaces"
+	]
+  }

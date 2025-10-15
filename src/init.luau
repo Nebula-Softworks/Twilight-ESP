@@ -1,145 +1,361 @@
-local services = require(script.utilities.services)
-local types = require(script.types)
-local utilities = require(script.utilities)
-local creator = require(script.utilities.creator)
-local playerEsp = require(script.components.playerEsp)
-local objectEsp = require(script.components.objectEsp)
+local services = require("@root/utilities/services")
+local playerEsp = require("@root/components/playerEsp")
 
-if getgenv().TwilightInstances == nil then
-	getgenv().TwilightInstances = {}
-end
+local Players = services.Players
+local RunService = services.RunService
+local UserInputService = services.UserInputService
+local Camera = workspace.CurrentCamera
+local LocalPlayer = Players.LocalPlayer
 
-if getgenv().TwilightInstances[getgenv().InterfaceName] then
-	getgenv().TwilightInstances[getgenv().InterfaceName].Unload(true)
-end
+local Twilight = {
+	Settings = {
+		-- Generic is anything not in a team, including external/custom objects bounded to an ESP instance
 
-local gui = creator.New("ScreenGui", { Name = "Twilight ESP " .. (getgenv().InterfaceName or ""), Enabled = false })
-utilities.ProtectUI(gui)
+		Enabled = false,
+		Checks = {
+			Visible = {
+				Enabled = false,
+				OnlyVisible = false,
+				Recolor = false, -- enable visible and invisible variations of colours.
+			},
+			Team = {
+				Enabled = false,
+				SelectedTeams = {
+					enemy = false,
+					friendly = false,
+					generic = false,
+					self = false,
+				},
+			},
+		},
 
-creator.New("Frame", {
-	Parent = gui,
-	Name = "PlayerESPs",
-	Visible = false,
-	Size = UDim2.fromScale(1, 1),
-	BackgroundTransparency = 1,
-})
-creator.New("Folder", {
-	Parent = gui.PlayerESPs,
-	Name = "PlayerESPTracers",
-})
-creator.New("Folder", {
-	Parent = gui,
-	Name = "Tracers",
-})
+		currentColors = {
+			generic = {
+				Box = {
+					Outline = {
+						Visible = Color3.new(1, 1, 1),
+						Invisible = Color3.new(1, 1, 1),
+					},
+					Fill = {
+						Visible = Color3.new(1, 1, 1),
+						Invisible = Color3.new(1, 1, 1),
+					},
+				},
+				CornerBox = {
+					Visible = Color3.new(1, 1, 1),
+					Invisible = Color3.new(1, 1, 1),
+				},
 
-local Twilight = require(script.contract) :: types.Twilight
-Twilight.Instance = gui
-Twilight._connections = {}
-Twilight.espObjects = {
-	Players = {},
+				healthBar = {
+					Outline = Color3.new(1, 1, 1),
+					Fills = {
+						Low = Color3.new(1, 1, 1),
+						Medium = Color3.new(1, 1, 1),
+						High = Color3.new(1, 1, 1),
+					},
+				},
+
+				Tracer = {
+					Visible = Color3.new(1, 1, 1),
+					Invisible = Color3.new(1, 1, 1),
+				},
+
+				Text = Color3.new(1, 1, 1),
+
+				Chams = {
+					Outline = {
+						Visible = Color3.new(1, 1, 1),
+						Invisible = Color3.new(1, 1, 1),
+					},
+					Fill = {
+						Visible = Color3.new(1, 1, 1),
+						Invisible = Color3.new(1, 1, 1),
+					},
+				},
+
+				Skeleton = {
+					Visible = Color3.new(1, 1, 1),
+					Invisible = Color3.new(1, 1, 1),
+				},
+			},
+			friendly = {
+				Box = {
+					Outline = {
+						Visible = Color3.new(1, 1, 1),
+						Invisible = Color3.new(1, 1, 1),
+					},
+					Fill = {
+						Visible = Color3.new(1, 1, 1),
+						Invisible = Color3.new(1, 1, 1),
+					},
+				},
+				CornerBox = {
+					Visible = Color3.new(1, 1, 1),
+					Invisible = Color3.new(1, 1, 1),
+				},
+
+				healthBar = {
+					Outline = Color3.new(1, 1, 1),
+					Fills = {
+						Low = Color3.new(1, 1, 1),
+						Medium = Color3.new(1, 1, 1),
+						High = Color3.new(1, 1, 1),
+					},
+				},
+
+				Tracer = {
+					Visible = Color3.new(1, 1, 1),
+					Invisible = Color3.new(1, 1, 1),
+				},
+
+				Text = Color3.new(1, 1, 1),
+
+				Chams = {
+					Outline = {
+						Visible = Color3.new(1, 1, 1),
+						Invisible = Color3.new(1, 1, 1),
+					},
+					Fill = {
+						Visible = Color3.new(1, 1, 1),
+						Invisible = Color3.new(1, 1, 1),
+					},
+				},
+
+				Skeleton = {
+					Visible = Color3.new(1, 1, 1),
+					Invisible = Color3.new(1, 1, 1),
+				},
+			},
+			enemy = {
+				Box = {
+					Outline = {
+						Visible = Color3.new(1, 1, 1),
+						Invisible = Color3.new(1, 1, 1),
+					},
+					Fill = {
+						Visible = Color3.new(1, 1, 1),
+						Invisible = Color3.new(1, 1, 1),
+					},
+				},
+				CornerBox = {
+					Visible = Color3.new(1, 1, 1),
+					Invisible = Color3.new(1, 1, 1),
+				},
+
+				healthBar = {
+					Outline = Color3.new(1, 1, 1),
+					Fills = {
+						Low = Color3.new(1, 1, 1),
+						Medium = Color3.new(1, 1, 1),
+						High = Color3.new(1, 1, 1),
+					},
+				},
+
+				Tracer = {
+					Visible = Color3.new(1, 1, 1),
+					Invisible = Color3.new(1, 1, 1),
+				},
+
+				Text = Color3.new(1, 1, 1),
+
+				Chams = {
+					Outline = {
+						Visible = Color3.new(1, 1, 1),
+						Invisible = Color3.new(1, 1, 1),
+					},
+					Fill = {
+						Visible = Color3.new(1, 1, 1),
+						Invisible = Color3.new(1, 1, 1),
+					},
+				},
+
+				Skeleton = {
+					Visible = Color3.new(1, 1, 1),
+					Invisible = Color3.new(1, 1, 1),
+				},
+			},
+			self = {
+				Box = {
+					Outline = {
+						Visible = Color3.new(1, 1, 1),
+						Invisible = Color3.new(1, 1, 1),
+					},
+					Fill = {
+						Visible = Color3.new(1, 1, 1),
+						Invisible = Color3.new(1, 1, 1),
+					},
+				},
+				CornerBox = {
+					Visible = Color3.new(1, 1, 1),
+					Invisible = Color3.new(1, 1, 1),
+				},
+
+				healthBar = {
+					Outline = Color3.new(1, 1, 1),
+					Fills = {
+						Low = Color3.new(1, 1, 1),
+						Medium = Color3.new(1, 1, 1),
+						High = Color3.new(1, 1, 1),
+					},
+				},
+
+				Tracer = {
+					Visible = Color3.new(1, 1, 1),
+					Invisible = Color3.new(1, 1, 1),
+				},
+
+				Text = Color3.new(1, 1, 1),
+
+				Chams = {
+					Outline = {
+						Visible = Color3.new(1, 1, 1),
+						Invisible = Color3.new(1, 1, 1),
+					},
+					Fill = {
+						Visible = Color3.new(1, 1, 1),
+						Invisible = Color3.new(1, 1, 1),
+					},
+				},
+
+				Skeleton = {
+					Visible = Color3.new(1, 1, 1),
+					Invisible = Color3.new(1, 1, 1),
+				},
+			},
+		},
+
+		healthBarSettings = {
+			Enabled = {
+				enemy = false,
+				friendly = false,
+				self = false,
+				generic = false,
+			},
+
+			Bar = false,
+			Text = false,
+			MaxHealthEnabled = false,
+
+			Position = 1, -- 1 - left, 2 - right
+			Suffix = "HP",
+		},
+
+		Style = 1, -- 1 Normal, 2 3D
+		Box = {
+			Enabled = false,
+			Filled = {
+				Enabled = false,
+				Transparency = 0.6,
+			},
+			Thickness = 1,
+		},
+		CornerBox = {
+			Enabled = false,
+			Thickness = 3,
+		},
+
+		Tracer = {
+			Enabled = {
+				enemy = false,
+				friendly = false,
+				generic = false,
+			},
+			Origin = 1, -- 1 Local HRP, 2 Bottom Viewport, 3 Top Viewport, 4 Center Viewport, 5 Mouse
+			Style = 1, -- 1 Line
+			Thickness = 1, --px
+		},
+
+		Name = {
+			Enabled = {
+				enemy = false,
+				friendly = false,
+				self = false,
+				generic = false,
+			},
+
+			Style = 1, -- 1 Display Name, 2 User Name, 3 Both
+		},
+		Distance = {
+			Enabled = {
+				enemy = false,
+				friendly = false,
+				self = false,
+				generic = false,
+			},
+			DistanceUnit = 1, -- 1 studs, 2 meters
+		},
+
+		Chams = {
+			Enabled = {
+				enemy = false,
+				friendly = false,
+				self = false,
+				generic = false,
+			},
+			Outline = {
+				Enabled = true,
+				Thickness = 0.1, --px
+				Transparency = 0,
+			},
+			Fill = {
+                Enabled = true,
+                Transparency = 0.5
+            },
+			OutlineThickness = 0.1,
+			Occlusion = false,
+		},
+
+		Skeleton = {
+			Enabled = {
+				enemy = false,
+				friendly = false,
+				self = false,
+				generic = false,
+			},
+			Thickness = 1, --px
+			Transparency = 1,
+			ExplicitBodyType = nil, -- 1 R15, 2 R6. But not required as the esp will auto detect body types
+		},
+
+		TextSize = 14,
+		MaxDistance = 2000,
+		RefreshRate = 1 / 240,
+
+		Snaplines = true,
+	},
+
+	Drawings = {
+		ESP = {},
+		Tracers = {},
+		Boxes = {},
+		Healthbars = {},
+		Names = {},
+		Distances = {},
+		Snaplines = {},
+		Skeleton = {},
+	},
+	Highlights = {},
+
+	_connections = {},
 }
-Twilight.settings = {} :: types.twilightSettings
 
-function Twilight.Load()
-	gui.Enabled = true
-end
-
-function Twilight.Unload(destroy: boolean?)
-	gui.Enabled = false
-	Twilight.unloaded = true
-	if destroy then
-		for i, v in pairs(Twilight.espObjects) do
-			if i ~= "Players" then
-				v.instance.chams.Parent = nil
-				v.instance.chams.Enabled = false
-				if destroy then
-					v.instance.chams:Destroy()
-				end
-			else
-				for i, v in pairs(v) do
-					v.instance.chams.Parent = nil
-					v.instance.chams.Enabled = false
-					if destroy then
-						v.instance.chams:Destroy()
-					end
-				end
-			end
-		end
-		for _, connection in pairs(Twilight._connections) do
-			connection:Disconnect()
-			connection = nil
-		end
-		gui:Destroy()
+function Twilight.CleanupESP()
+	for _, player in ipairs(Players:GetPlayers()) do
+		playerEsp:RemoveESP(Twilight, player)
 	end
+	Twilight.Drawings.ESP = {}
+	Twilight.Drawings.Skeleton = {}
+	Twilight.Highlights = {}
 end
 
---task.spawn(function()
-for _, player in pairs(services.Players:GetChildren()) do
-	playerEsp:BindPlayer(player)
-end
-services.Players.PlayerAdded:Connect(function(player)
-	playerEsp:BindPlayer(player)
-end)
---end)
+function Twilight:Load() end
 
-function Twilight:EnablePlayerESP()
-	gui.PlayerESPs.Visible = true
-end
+function Twilight:Unload(destroy) end
 
-function Twilight:DisablePlayerESP()
-	gui.PlayerESPs.Visible = false
-end
+function Twilight:BindESPToObject(object, rootPart) end
 
-function Twilight:BindESPToObject(object: Instance)
-	objectEsp:new(object)
-end
+function Twilight:EnablePlayerESP() end
 
-function Twilight:SetOptions(options) -- done this way because of defaulting
-	options = options or {}
-	Twilight.settings = utilities.Kwargify(options, {
-		currentColors = utilities.Kwargify(options.currentColors or {}, {
-			boxNeutral = Color3.new(1, 1, 1),
-			boxSelf = Color3.new(0, 0, 1),
-			boxTeam = Color3.new(0, 1, 0),
-			boxEnemy = Color3.new(1, 0, 0),
+function Twilight:DisablePlayerESP() end
 
-			boxOutlineNeutral = Color3.new(1, 1, 1),
-			boxOutlineSelf = Color3.new(0, 0, 1),
-			boxOutlineTeam = Color3.new(0, 1, 0),
-			boxOutlineEnemy = Color3.new(1, 0, 0),
-
-			highlightFillNeutral = Color3.new(1, 1, 1),
-			highlightFillEnemy = Color3.new(1, 0, 0),
-			highlightFillTeam = Color3.new(0, 1, 0),
-			highlightFillSelf = Color3.new(0, 0, 1),
-			highlightOutline = Color3.new(1, 1, 1),
-
-			healthBarFillNeutral = Color3.new(1, 1, 1),
-			healthBarFillNeutralLow = Color3.new(0.7, 0.7, 0.7),
-			healthBarFillSelf = Color3.new(0, 0, 1),
-			healthBarFillSelfLow = Color3.new(0, 0, 0.5),
-			healthBarFillTeam = Color3.new(0, 1, 0),
-			healthBarFillEnemy = Color3.new(1, 0, 0),
-			healthBarFillTeamLow = Color3.new(0, 0.5, 0),
-			healthBarFillEnemyLow = Color3.new(0.5, 0, 0),
-		}),
-		healthbarEnabled = true,
-		healthbarTeamCheck = false,
-		boxEnabled = true,
-		outlineBoxEnabled = true,
-		boxTeamCheck = false,
-		outlineBoxTeamCheck = false,
-		chamsEnabled = false,
-		chamsTeamCheck = true,
-		tracersEnabled = true,
-
-		useTeamColor = false, -- sets the esp colors to be based off teams
-		limitDistance = nil,
-		lowHealthAlert = true,
-		showObjectNames = false,
-	})
-end
-
-Twilight:SetOptions()
-getgenv().TwilightInstances[getgenv().InterfaceName] = Twilight
 return Twilight

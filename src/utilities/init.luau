@@ -1,39 +1,56 @@
---// Variables
-local services = require(script.services)
+local root = require("@root")
+local services = require("@root/utilities/services")
 
-local utility = {}
+local Players = services.Players
+local UserInputService = services.UserInputService
+local LocalPlayer = Players.LocalPlayer
+local Camera = workspace.CurrentCamera
 
---// Initialize
+local functions = {}
 
-function utility.ProtectUI(gui)
-	if gethui then
-		gui.Parent = gethui()
-		return gethui()
-	elseif syn and syn.protect_gui then
-		syn.protect_gui(gui)
-		return services.CoreGui
-	elseif not services.RunService:IsStudio() and services.CoreGui:FindFirstChild("RobloxGui") then
-		gui.Parent = services.CoreGui:FindFirstChild("RobloxGui")
-		return services.CoreGui:FindFirstChild("RobloxGui")
+function functions:GetTracerOrigin()
+	local origin = root.Settings.Tracer.Origin
+	if origin == 2 then
+		return Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y)
+	elseif origin == 3 then
+		return Vector2.new(Camera.ViewportSize.X / 2, 0)
+	elseif origin == 5 then
+		return UserInputService:GetMouseLocation()
+	elseif origin == 4 then
+		return Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y / 2)
 	else
-		if not services.RunService:IsStudio() then
-			gui.Parent = services.CoreGui
-			return services.CoreGui
-		else
-			gui.Parent = services.Players.LocalPlayer.PlayerGui
-			return services.Players.LocalPlayer.PlayerGui
-		end
+		return Camera:WorldToViewportPoint(LocalPlayer.Character.HumanoidRootPart.Position)
 	end
 end
 
-function utility.Kwargify(array, defaults)
-	array = array or {}
-	for defaultprop, defaultvalue in pairs(defaults) do
-		if array[defaultprop] == nil then
-			array[defaultprop] = defaultvalue
-		end
+function functions:GetBoxCorners(cf, size)
+	local corners = {
+		Vector3.new(-size.X / 2, -size.Y / 2, -size.Z / 2),
+		Vector3.new(-size.X / 2, -size.Y / 2, size.Z / 2),
+		Vector3.new(-size.X / 2, size.Y / 2, -size.Z / 2),
+		Vector3.new(-size.X / 2, size.Y / 2, size.Z / 2),
+		Vector3.new(size.X / 2, -size.Y / 2, -size.Z / 2),
+		Vector3.new(size.X / 2, -size.Y / 2, size.Z / 2),
+		Vector3.new(size.X / 2, size.Y / 2, -size.Z / 2),
+		Vector3.new(size.X / 2, size.Y / 2, size.Z / 2),
+	}
+
+	for i, corner in ipairs(corners) do
+		corners[i] = cf:PointToWorldSpace(corner)
 	end
-	return array
+
+	return corners
 end
 
-return utility
+function functions:Kwargify(defaults, passed)
+	defaults = defaults or {}
+	passed = passed or {}
+	for i, v in pairs(defaults) do
+		if passed[i] == nil then
+			passed[i] = v
+		end
+	end
+	return passed -- incase smth went wrong
+end
+
+return functions

@@ -1,4 +1,4 @@
-local twilight = require(game.ReplicatedStorage["Twilight ESP"])
+local twilight = require(game.ReplicatedStorage["twilight"])
 twilight.Load()
 twilight.EnablePlayerESP()
 twilight.settings.outlineBoxEnabled = true
@@ -14,8 +14,9 @@ twilight.settings.healthbarTeamCheck = true
 twilight.settings.outlineBoxTeamCheck = true
 twilight.settings.useTeamColor = true
 
-require(game.ReplicatedStorage["Twilight ESP"]):BindESPToObject(workspace.trees:FindFirstChild("Cherry Blossom M"))
+require(game.ReplicatedStorage["twilight"]):BindESPToObject(workspace.trees:FindFirstChild("Cherry Blossom M"))
 
 task.wait(5)
 
 --twilight.Unload()
+game:GetService("ReplicatedStorage").twilighthelper:FireServer()
