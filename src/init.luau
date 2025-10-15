@@ -162,7 +162,7 @@ local Twilight = {
 					Invisible = Color3.new(1, 1, 1),
 				},
 			},
-			self = {
+			["self"] = {
 				Box = {
 					Outline = {
 						Visible = Color3.new(1, 1, 1),
@@ -319,9 +319,15 @@ local Twilight = {
 	_connections = {},
 }
 
-function Twilight:Load() end
+local isAlreadyUnloaded = false
+function Twilight:Load()
+	Twilight.Settings.Enabled = true
+	isAlreadyUnloaded = false
+end
 
 function Twilight:Unload(destroy)
+	Twilight.Settings.Enabled = false
+	isAlreadyUnloaded = true
 	if destroy then
 		for _, player in ipairs(Players:GetPlayers()) do
 			playerEsp:RemoveESP(Twilight, player)
@@ -368,7 +374,9 @@ table.insert(
 	Twilight._connections,
 	RunService.RenderStepped:Connect(function()
 		if not Twilight.Settings.Enabled then
-			Twilight:Unload(false)
+			if not isAlreadyUnloaded then
+				Twilight:Unload(false)
+			end
 			return
 		end
 

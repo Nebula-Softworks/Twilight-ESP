@@ -1,4 +1,3 @@
-local root = require("@root")
 local services = require("@root/utilities/services")
 
 local Players = services.Players
@@ -8,7 +7,7 @@ local Camera = workspace.CurrentCamera
 
 local functions = {}
 
-function functions:GetTracerOrigin()
+function functions:GetTracerOrigin(root)
 	local origin = root.Settings.Tracer.Origin
 	if origin == 2 then
 		return Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y)
@@ -18,8 +17,9 @@ function functions:GetTracerOrigin()
 		return Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y / 2)
 	elseif origin == 5 then
 		return UserInputService:GetMouseLocation()
-	else
-		return Camera:WorldToViewportPoint(LocalPlayer.Character.HumanoidRootPart.Position)
+	elseif origin == 1 then
+		local v3 = Camera:WorldToViewportPoint(LocalPlayer.Character.HumanoidRootPart.Position)
+		return Vector2.new(v3.X, v3.Y)
 	end
 end
 
@@ -41,7 +41,7 @@ function functions:GetPlayerType(Player)
 	return teamType
 end
 
-function functions:GetPlayerColor(Player, isVisible, part, additional)
+function functions:GetPlayerColor(root, Player, isVisible, part, additional)
 	local teamType
 	if Player.Neutral then
 		teamType = "generic"
@@ -69,6 +69,8 @@ function functions:GetPlayerColor(Player, isVisible, part, additional)
 			currentStatus = "Low"
 		end
 		return root.Settings.currentColors[teamType].HealthBar.Fills[currentStatus]
+	elseif part == "HealthBar" or part == "Text" then
+		return root.Settings.currentColors[teamType][part]
 	end
 
 	if root.Settings.Checks.Visible.Enabled and not isVisible then

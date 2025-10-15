@@ -16,61 +16,165 @@
 	To view the source, see the 'src' folder on GitHub!
 	or download the .rbxm and open it in studio...	
 
-]]local a a={cache={}, load=function(b)if not a.cache[b]then a.cache[b]={c=a[b]()}end return a.cache[b].c end}do function a.a()
-
-local function cast(b)
-return cloneref and cloneref(game:GetService(b))or game:GetService(b)
+]]
+local __DARKLUA_BUNDLE_MODULES={cache={}}do do local function __modImpl()
+local function cast(service)
+return cloneref and cloneref(game:GetService(service))or game:GetService(service)
 end
 
 
-local b={}
-setmetatable(b,{
-__index=function(c,d)
-return cast(d)
+local module={}
+setmetatable(module,{
+__index=function(table,key)
+return cast(key)
 end,
 })
-return b end function a.b()
+return module end function __DARKLUA_BUNDLE_MODULES.a()local v=__DARKLUA_BUNDLE_MODULES.cache.a if not v then v={c=__modImpl()}__DARKLUA_BUNDLE_MODULES.cache.a=v end return v.c end end do local function __modImpl()
 
-local b=a.load('a')
+local services=__DARKLUA_BUNDLE_MODULES.a()
 
-local c,
-d,
-e,
-f=b.Players,b.RunService,b.UserInputService,workspace.CurrentCamera
-local g,
+local Players,
+UserInputService=services.Players,services.UserInputService
+local LocalPlayer,
+Camera,
 
-h=c.LocalPlayer,{}
+functions=Players.LocalPlayer,workspace.CurrentCamera,{}
 
-
-
-
-
-function h:CreateESP(i,j)
-local k
-if j.Neutral then
-k="generic"
+function functions:GetTracerOrigin(root)
+local origin=root.Settings.Tracer.Origin
+if origin==2 then
+return Vector2.new(Camera.ViewportSize.X/2,Camera.ViewportSize.Y)
+elseif origin==3 then
+return Vector2.new(Camera.ViewportSize.X/2,0)
+elseif origin==4 then
+return Vector2.new(Camera.ViewportSize.X/2,Camera.ViewportSize.Y/2)
+elseif origin==5 then
+return UserInputService:GetMouseLocation()
 else
-if j.TeamColor==g.TeamColor then
-k="friendly"
+local v3=Camera:WorldToViewportPoint(LocalPlayer.Character.HumanoidRootPart.Position)
+return Vector2.new(v3.X,v3.Y)
+end
+end
+
+function functions:GetPlayerType(Player)
+local teamType
+if Player.Neutral then
+teamType="generic"
 else
-k="enemy"
+if Player.TeamColor==LocalPlayer.TeamColor then
+teamType="friendly"
+else
+teamType="enemy"
 end
 end
 
-if j==g then
-if
-not(
-i.Settings
-and i.Settings.Checks.Team.Enabled
-and i.Settings.Checks.Team.SelectedTeams.self
-)
-then
-return
+if Player==LocalPlayer then
+teamType="self"
 end
-k="self"
+return teamType
 end
 
-local l={
+function functions:GetPlayerColor(root,Player,isVisible,part,additional)
+local teamType
+if Player.Neutral then
+teamType="generic"
+else
+if Player.TeamColor==LocalPlayer.TeamColor then
+teamType="friendly"
+else
+teamType="enemy"
+end
+end
+
+if Player==LocalPlayer then
+teamType="self"
+end
+
+if part=="HealthBar"and additional=="Fill"then
+local maxHealth,
+currentHealth,
+currentStatus=Player.Character.Humanoid.MaxHealth,Player.Character.Humanoid.Health,nil
+if currentHealth/maxHealth>0.65 then
+currentStatus="High"
+elseif currentHealth/maxHealth>0.2 then
+currentStatus="Medium"
+else
+currentStatus="Low"
+end
+return root.Settings.currentColors[teamType].HealthBar.Fills[currentStatus]
+elseif part=="HealthBar"or part=="Text"then
+return root.Settings.currentColors[teamType][part]
+end
+
+if root.Settings.Checks.Visible.Enabled and not isVisible then
+if additional then
+return root.Settings.currentColors[teamType][part][additional].Invisible
+else
+return root.Settings.currentColors[teamType][part].Invisible
+end
+else
+if additional then
+return root.Settings.currentColors[teamType][part][additional].Visible
+else
+return root.Settings.currentColors[teamType][part].Visible
+end
+end
+end
+
+function functions:GetBoxCorners(cf,size)
+local corners={
+Vector3.new(-size.X/2,-size.Y/2,-size.Z/2),
+Vector3.new(-size.X/2,-size.Y/2,size.Z/2),
+Vector3.new(-size.X/2,size.Y/2,-size.Z/2),
+Vector3.new(-size.X/2,size.Y/2,size.Z/2),
+Vector3.new(size.X/2,-size.Y/2,-size.Z/2),
+Vector3.new(size.X/2,-size.Y/2,size.Z/2),
+Vector3.new(size.X/2,size.Y/2,-size.Z/2),
+Vector3.new(size.X/2,size.Y/2,size.Z/2),
+}
+
+for i,corner in ipairs(corners)do
+corners[i]=cf:PointToWorldSpace(corner)
+end
+
+return corners
+end
+
+function functions:Kwargify(defaults,passed)
+defaults=defaults or{}
+passed=passed or{}
+for i,v in pairs(defaults)do
+if passed[i]==nil then
+passed[i]=v
+end
+end
+return passed
+end
+
+return functions end function __DARKLUA_BUNDLE_MODULES.b()local v=__DARKLUA_BUNDLE_MODULES.cache.b if not v then v={c=__modImpl()}__DARKLUA_BUNDLE_MODULES.cache.b=v end return v.c end end do local function __modImpl()
+
+
+
+
+
+
+
+
+local services,
+utilities=__DARKLUA_BUNDLE_MODULES.a(),__DARKLUA_BUNDLE_MODULES.b()
+
+local Players,
+RunService,
+UserInputService,
+Camera=services.Players,services.RunService,services.UserInputService,workspace.CurrentCamera
+local LocalPlayer,
+
+playerEsp=Players.LocalPlayer,{}
+
+function playerEsp:CreateESP(Library,Player)
+local teamType,
+
+box=utilities:GetPlayerType(Player),{
 TopLeft=Drawing.new("Line"),
 TopRight=Drawing.new("Line"),
 BottomLeft=Drawing.new("Line"),
@@ -81,81 +185,84 @@ Top=Drawing.new("Line"),
 Bottom=Drawing.new("Line"),
 }
 
-for m,n in pairs(l)do
-n.Visible=false
-n.Color=i.Settings.currentColors[k].Box.Outline.Visible
-n.Thickness=i.Settings.Box.Thickness
-if n==l.Fill then
-n.Filled=true
-n.Transparency=i.Settings.Box.Filled.Transparency
+for _,line in pairs(box)do
+line.Visible=false
+line.Color=Library.Settings.currentColors[teamType].Box.Outline.Visible
+line.Thickness=Library.Settings.Box.Thickness
+if line==box.Fill then
+line.Filled=true
+line.Transparency=Library.Settings.Box.Filled.Transparency
 end
 end
 
-local m=Drawing.new("Line")
-m.Visible=false
-m.Color=i.Settings.currentColors[k].Tracer.Visible
-m.Thickness=i.Settings.Tracers.Thickness
+local tracer=Drawing.new("Line")
+tracer.Visible=false
+tracer.Color=Library.Settings.currentColors[teamType].Tracer.Visible
+tracer.Thickness=Library.Settings.Tracer.Thickness
 
-local n={
+local healthBar={
 Outline=Drawing.new("Square"),
 Fill=Drawing.new("Square"),
 Text=Drawing.new("Text"),
 }
 
-for o,p in pairs(n)do
-p.Visible=false
-local q
-if j.Character.Humanoid.Health/j.Character.Humanoid.MaxHealth>0.6 then
-q="High"
-elseif j.Character.Humanoid.Health/j.Character.Humanoid.MaxHealth>0.2 then
-q="Medium"
+for _,obj in pairs(healthBar)do
+obj.Visible=false
+local healthtype
+if Player.Character.Humanoid.Health/Player.Character.Humanoid.MaxHealth>0.6 then
+healthtype="High"
+elseif Player.Character.Humanoid.Health/Player.Character.Humanoid.MaxHealth>0.2 then
+healthtype="Medium"
 else
-q="Low"
+healthtype="Low"
 end
-if p==n.Fill then
-p.Color=i.Settings.currentColors[k].healthBar.Fills[q]
-p.Filled=true
-elseif p==n.Text then
-p.Center=true
-p.Size=i.Settings.TextSize
-p.Color=i.Settings.currentColors[k].healthBar.Fills[q]
-p.Font=2
+if not Library.Settings.currentColors[teamType].HealthBar then
+continue
+end
+if obj==healthBar.Fill then
+obj.Color=Library.Settings.currentColors[teamType].HealthBar.Fills[healthtype]
+obj.Filled=true
+elseif obj==healthBar.Text then
+obj.Center=true
+obj.Size=Library.Settings.TextSize
+obj.Color=Library.Settings.currentColors[teamType].HealthBar.Fills[healthtype]
+obj.Font=2
 else
-p.Color=i.Settings.currentColors[k].healthBar.Outline
-p.Filled=false
+print(teamType)
+obj.Filled=false
 end
 end
 
-local o={
+local info={
 Name=Drawing.new("Text"),
 Distance=Drawing.new("Text"),
 }
 
-for p,q in pairs(o)do
-q.Visible=false
-q.Center=true
-q.Size=i.Settings.TextSize
-q.Color=i.Settings.currentColors[k].Text
-q.Font=2
-q.Outline=true
+for _,text in pairs(info)do
+text.Visible=false
+text.Center=true
+text.Size=Library.Settings.TextSize
+text.Color=Library.Settings.currentColors[teamType].Text
+text.Font=2
+text.Outline=true
 end
 
-local p=Drawing.new("Line")
-p.Visible=false
-p.Color=i.Settings.currentColors[k].Box.Outline
-p.Thickness=1
+local snapline=Drawing.new("Line")
+snapline.Visible=false
+snapline.Color=Library.Settings.currentColors[teamType].Box.Outline.Visible
+snapline.Thickness=1
 
-local q=Instance.new("Highlight")
-q.FillColor=i.Settings.currentColors[k].Chams.Fill.Visible
-q.OutlineColor=i.Settings.currentColors[k].Chams.Outline.Visible
-q.FillTransparency=i.Settings.Chams.Fill.Transparency
-q.OutlineTransparency=i.Settings.Chams.Oultine.Transparency
-q.DepthMode=Enum.HighlightDepthMode.AlwaysOnTop
-q.Enabled=i.Settings.Chams.Enabled[k]
+local highlight=Instance.new("Highlight")
+highlight.FillColor=Library.Settings.currentColors[teamType].Chams.Fill.Visible
+highlight.OutlineColor=Library.Settings.currentColors[teamType].Chams.Outline.Visible
+highlight.FillTransparency=Library.Settings.Chams.Fill.Transparency
+highlight.OutlineTransparency=Library.Settings.Chams.Outline.Transparency
+highlight.DepthMode=Enum.HighlightDepthMode.AlwaysOnTop
+highlight.Enabled=false
 
-i.Highlights[j]=q
+Library.Highlights[Player]=highlight
 
-local r={
+local skeleton={
 
 Head=Drawing.new("Line"),
 Neck=Drawing.new("Line"),
@@ -187,386 +294,1114 @@ RightLowerLeg=Drawing.new("Line"),
 RightFoot=Drawing.new("Line"),
 }
 
-for s,t in pairs(r)do
-t.Visible=false
-t.Color=i.Settings.currentColors[k].Skeleton.Visible
-t.Thickness=i.Settings.Skeleton.Thickness
-t.Transparency=i.Settings.Skeleton.Transparency
+for _,line in pairs(skeleton)do
+line.Visible=false
+line.Color=Library.Settings.currentColors[teamType].Skeleton.Visible
+line.Thickness=Library.Settings.Skeleton.Thickness
+line.Transparency=Library.Settings.Skeleton.Transparency
 end
 
-i.Drawings.Skeleton[j]=r
+Library.Drawings.Skeleton[Player]=skeleton
 
-i.Drawings.ESP[j]={
-Box=l,
-Tracer=m,
-HealthBar=n,
-Info=o,
-Snapline=p,
+Library.Drawings.ESP[Player]={
+Box=box,
+Tracer=tracer,
+HealthBar=healthBar,
+Info=info,
+Snapline=snapline,
 }
 end
 
-function h:RemoveESP(i,j)end
+function playerEsp:RemoveESP(Library,Player)
+local esp=Library.Drawings.ESP[Player]
+if esp then
+for _,obj in pairs(esp.Box)do
+obj:Remove()
+end
+esp.Tracer:Remove()
+for _,obj in pairs(esp.HealthBar)do
+obj:Remove()
+end
+for _,obj in pairs(esp.Info)do
+obj:Remove()
+end
+esp.Snapline:Remove()
+Library.Drawings.ESP[Player]=nil
+end
 
-return h end end
+local highlight=Library.Highlights[Player]
+if highlight then
+highlight:Destroy()
+Library.Highlights[Player]=nil
+end
 
-local b,
-c=a.load('a'),a.load('b')
+local skeleton=Library.Drawings.Skeleton[Player]
+if skeleton then
+for _,line in pairs(skeleton)do
+line:Remove()
+end
+Library.Drawings.Skeleton[Player]=nil
+end
+end
 
-local d,
-e,
-f,
-g=b.Players,b.RunService,b.UserInputService,workspace.CurrentCamera
-local h,
+function playerEsp:UpdateESP(Library,player)
+if not Library.Settings.Enabled then
+return
+end
 
-i=d.LocalPlayer,{
-Settings={
+local esp=Library.Drawings.ESP[player]
+if not esp then
+return
+end
+
+local character=player.Character
+if not character then
+
+for _,obj in pairs(esp.Box)do
+obj.Visible=false
+end
+esp.Tracer.Visible=false
+for _,obj in pairs(esp.HealthBar)do
+obj.Visible=false
+end
+for _,obj in pairs(esp.Info)do
+obj.Visible=false
+end
+esp.Snapline.Visible=false
+
+local skeleton=Library.Drawings.Skeleton[player]
+if skeleton then
+for _,line in pairs(skeleton)do
+line.Visible=false
+end
+end
+return
+end
+
+local rootPart=character:FindFirstChild("HumanoidRootPart")
+if not rootPart then
+
+for _,obj in pairs(esp.Box)do
+obj.Visible=false
+end
+esp.Tracer.Visible=false
+for _,obj in pairs(esp.HealthBar)do
+obj.Visible=false
+end
+for _,obj in pairs(esp.Info)do
+obj.Visible=false
+end
+esp.Snapline.Visible=false
+
+local skeleton=Library.Drawings.Skeleton[player]
+if skeleton then
+for _,line in pairs(skeleton)do
+line.Visible=false
+end
+end
+return
+end
 
 
-Enabled=false,
-Checks={
-Visible={
-Enabled=false,
-OnlyVisible=false,
-Recolor=false,
-},
-Team={
-Enabled=false,
-SelectedTeams={
-enemy=false,
-friendly=false,
-generic=false,
-self=false,
-},
-},
-},
+local _,isOnScreen=Camera:WorldToViewportPoint(rootPart.Position)
+if not isOnScreen then
+for _,obj in pairs(esp.Box)do
+obj.Visible=false
+end
+esp.Tracer.Visible=false
+for _,obj in pairs(esp.HealthBar)do
+obj.Visible=false
+end
+for _,obj in pairs(esp.Info)do
+obj.Visible=false
+end
+esp.Snapline.Visible=false
 
-currentColors={
-generic={
-Box={
-Outline={
-Visible=Color3.new(1,1,1),
-Invisible=Color3.new(1,1,1),
-},
-Fill={
-Visible=Color3.new(1,1,1),
-Invisible=Color3.new(1,1,1),
-},
-},
-CornerBox={
-Visible=Color3.new(1,1,1),
-Invisible=Color3.new(1,1,1),
-},
+local skeleton=Library.Drawings.Skeleton[player]
+if skeleton then
+for _,line in pairs(skeleton)do
+line.Visible=false
+end
+end
+return
+end
 
-healthBar={
-Outline=Color3.new(1,1,1),
-Fills={
-Low=Color3.new(1,1,1),
-Medium=Color3.new(1,1,1),
-High=Color3.new(1,1,1),
-},
-},
+local humanoid=character:FindFirstChild("Humanoid")
+if not humanoid or humanoid.Health<=0 then
+for _,obj in pairs(esp.Box)do
+obj.Visible=false
+end
+esp.Tracer.Visible=false
+for _,obj in pairs(esp.HealthBar)do
+obj.Visible=false
+end
+for _,obj in pairs(esp.Info)do
+obj.Visible=false
+end
+esp.Snapline.Visible=false
 
-Tracer={
-Visible=Color3.new(1,1,1),
-Invisible=Color3.new(1,1,1),
-},
+local skeleton=Library.Drawings.Skeleton[player]
+if skeleton then
+for _,line in pairs(skeleton)do
+line.Visible=false
+end
+end
+return
+end
 
-Text=Color3.new(1,1,1),
+local pos,onScreen=Camera:WorldToViewportPoint(rootPart.Position)
+local distance,
 
-Chams={
-Outline={
-Visible=Color3.new(1,1,1),
-Invisible=Color3.new(1,1,1),
-},
-Fill={
-Visible=Color3.new(1,1,1),
-Invisible=Color3.new(1,1,1),
-},
-},
+isVisible=(rootPart.Position-Camera.CFrame.Position).Magnitude,true
+if onScreen then
+if
+not(
+#workspace.CurrentCamera:GetPartsObscuringTarget(
+{workspace.CurrentCamera.CFrame.Position,rootPart.Position},
+{rootPart}
+)==0
+)
+then
+isVisible=false
+if Library.Settings.Checks.Visible.Enabled and Library.Settings.Checks.Visible.OnlyVisible then
+for _,obj in pairs(esp.Box)do
+obj.Visible=false
+end
+esp.Tracer.Visible=false
+for _,obj in pairs(esp.HealthBar)do
+obj.Visible=false
+end
+for _,obj in pairs(esp.Info)do
+obj.Visible=false
+end
+esp.Snapline.Visible=false
 
-Skeleton={
-Visible=Color3.new(1,1,1),
-Invisible=Color3.new(1,1,1),
-},
-},
-friendly={
-Box={
-Outline={
-Visible=Color3.new(1,1,1),
-Invisible=Color3.new(1,1,1),
-},
-Fill={
-Visible=Color3.new(1,1,1),
-Invisible=Color3.new(1,1,1),
-},
-},
-CornerBox={
-Visible=Color3.new(1,1,1),
-Invisible=Color3.new(1,1,1),
-},
+local skeleton=Library.Drawings.Skeleton[player]
+if skeleton then
+for _,line in pairs(skeleton)do
+line.Visible=false
+end
+end
+return
+end
+end
+end
+if not onScreen or distance>Library.Settings.MaxDistance then
+for _,obj in pairs(esp.Box)do
+obj.Visible=false
+end
+esp.Tracer.Visible=false
+for _,obj in pairs(esp.HealthBar)do
+obj.Visible=false
+end
+for _,obj in pairs(esp.Info)do
+obj.Visible=false
+end
+esp.Snapline.Visible=false
+return
+end
 
-healthBar={
-Outline=Color3.new(1,1,1),
-Fills={
-Low=Color3.new(1,1,1),
-Medium=Color3.new(1,1,1),
-High=Color3.new(1,1,1),
-},
-},
+local teamType=utilities:GetPlayerType(player)
 
-Tracer={
-Visible=Color3.new(1,1,1),
-Invisible=Color3.new(1,1,1),
-},
+if Library.Settings.Checks.Team.Enabled then
+if Library.Settings.Checks.Team.SelectedTeams[teamType]==false then
+for _,obj in pairs(esp.Box)do
+obj.Visible=false
+end
+esp.Tracer.Visible=false
+for _,obj in pairs(esp.HealthBar)do
+obj.Visible=false
+end
+for _,obj in pairs(esp.Info)do
+obj.Visible=false
+end
+esp.Snapline.Visible=false
+return
+end
+end
 
-Text=Color3.new(1,1,1),
+local boxColor,
+boxFillColor,
+tracerColor,
+textColor,
+skeletonColor,
+chamsOutlineColor,
+chamsFillColor,
+currentHealthColor,
+healthOutlineColor,
+size,
+cf=utilities:GetPlayerColor(Library,player,isVisible,"Box","Outline"),utilities:GetPlayerColor(Library,player,isVisible,"Box","Fill"),utilities:GetPlayerColor(Library,player,isVisible,"Tracer"),utilities:GetPlayerColor(Library,player,isVisible,"Text"),utilities:GetPlayerColor(Library,player,isVisible,"Skeleton"),utilities:GetPlayerColor(Library,player,isVisible,"Chams","Outline"),utilities:GetPlayerColor(Library,player,isVisible,"Chams","Fill"),utilities:GetPlayerColor(Library,player,isVisible,"HealthBar","Fill"),utilities:GetPlayerColor(Library,player,isVisible,"HealthBar","Outline"),character:GetExtentsSize(),rootPart.CFrame
 
-Chams={
-Outline={
-Visible=Color3.new(1,1,1),
-Invisible=Color3.new(1,1,1),
-},
-Fill={
-Visible=Color3.new(1,1,1),
-Invisible=Color3.new(1,1,1),
-},
-},
+local top,top_onscreen=Camera:WorldToViewportPoint(cf*CFrame.new(0,size.Y/2,0).Position)
+local bottom,bottom_onscreen=Camera:WorldToViewportPoint(cf*CFrame.new(0,-size.Y/2,0).Position)
 
-Skeleton={
-Visible=Color3.new(1,1,1),
-Invisible=Color3.new(1,1,1),
-},
-},
-enemy={
-Box={
-Outline={
-Visible=Color3.new(1,1,1),
-Invisible=Color3.new(1,1,1),
-},
-Fill={
-Visible=Color3.new(1,1,1),
-Invisible=Color3.new(1,1,1),
-},
-},
-CornerBox={
-Visible=Color3.new(1,1,1),
-Invisible=Color3.new(1,1,1),
-},
+if not top_onscreen or not bottom_onscreen then
+for _,obj in pairs(esp.Box)do
+obj.Visible=false
+end
+return
+end
 
-healthBar={
-Outline=Color3.new(1,1,1),
-Fills={
-Low=Color3.new(1,1,1),
-Medium=Color3.new(1,1,1),
-High=Color3.new(1,1,1),
-},
-},
+local screenSize=bottom.Y-top.Y
+local boxWidth=screenSize*0.65
+local boxPosition,
+boxSize=Vector2.new(top.X-boxWidth/2,top.Y),Vector2.new(boxWidth,screenSize)
 
-Tracer={
-Visible=Color3.new(1,1,1),
-Invisible=Color3.new(1,1,1),
-},
 
-Text=Color3.new(1,1,1),
+for _,obj in pairs(esp.Box)do
+obj.Visible=false
+end
 
-Chams={
-Outline={
-Visible=Color3.new(1,1,1),
-Invisible=Color3.new(1,1,1),
-},
-Fill={
-Visible=Color3.new(1,1,1),
-Invisible=Color3.new(1,1,1),
-},
-},
+if Library.Settings.Box.Enabled then
+if Library.Settings.Box.Style==3 then
+local front,
 
-Skeleton={
-Visible=Color3.new(1,1,1),
-Invisible=Color3.new(1,1,1),
-},
-},
-self={
-Box={
-Outline={
-Visible=Color3.new(1,1,1),
-Invisible=Color3.new(1,1,1),
-},
-Fill={
-Visible=Color3.new(1,1,1),
-Invisible=Color3.new(1,1,1),
-},
-},
-CornerBox={
-Visible=Color3.new(1,1,1),
-Invisible=Color3.new(1,1,1),
-},
 
-healthBar={
-Outline=Color3.new(1,1,1),
-Fills={
-Low=Color3.new(1,1,1),
-Medium=Color3.new(1,1,1),
-High=Color3.new(1,1,1),
-},
-},
 
-Tracer={
-Visible=Color3.new(1,1,1),
-Invisible=Color3.new(1,1,1),
-},
 
-Text=Color3.new(1,1,1),
 
-Chams={
-Outline={
-Visible=Color3.new(1,1,1),
-Invisible=Color3.new(1,1,1),
-},
-Fill={
-Visible=Color3.new(1,1,1),
-Invisible=Color3.new(1,1,1),
-},
-},
 
-Skeleton={
-Visible=Color3.new(1,1,1),
-Invisible=Color3.new(1,1,1),
-},
-},
-},
-
-healthBarSettings={
-Enabled={
-enemy=false,
-friendly=false,
-self=false,
-generic=false,
-},
-
-Bar=false,
-Text=false,
-MaxHealthEnabled=false,
-
-Position=1,
-Suffix="HP",
-},
-
-Style=1,
-Box={
-Enabled=false,
-Filled={
-Enabled=false,
-Transparency=0.6,
-},
-Thickness=1,
-},
-CornerBox={
-Enabled=false,
-Thickness=3,
-},
-
-Tracer={
-Enabled={
-enemy=false,
-friendly=false,
-generic=false,
-},
-Origin=1,
-Style=1,
-Thickness=1,
-},
-
-Name={
-Enabled={
-enemy=false,
-friendly=false,
-self=false,
-generic=false,
-},
-
-Style=1,
-},
-Distance={
-Enabled={
-enemy=false,
-friendly=false,
-self=false,
-generic=false,
-},
-DistanceUnit=1,
-},
-
-Chams={
-Enabled={
-enemy=false,
-friendly=false,
-self=false,
-generic=false,
-},
-Outline={
-Enabled=true,
-Thickness=0.1,
-Transparency=0,
-},
-Fill={
-Enabled=true,
-Transparency=0.5
-},
-OutlineThickness=0.1,
-Occlusion=false,
-},
-
-Skeleton={
-Enabled={
-enemy=false,
-friendly=false,
-self=false,
-generic=false,
-},
-Thickness=1,
-Transparency=1,
-ExplicitBodyType=nil,
-},
-
-TextSize=14,
-MaxDistance=2000,
-RefreshRate=4.166666666666667E-3,
-
-Snaplines=true,
-},
-
-Drawings={
-ESP={},
-Tracers={},
-Boxes={},
-Healthbars={},
-Names={},
-Distances={},
-Snaplines={},
-Skeleton={},
-},
-Highlights={},
-
-_connections={},
+back={TL=Camera:WorldToViewportPoint((cf*CFrame.new(-size.X/2,size.Y/2,-size.Z/2)).Position),TR=Camera:WorldToViewportPoint((cf*CFrame.new(size.X/2,size.Y/2,-size.Z/2)).Position),BL=Camera:WorldToViewportPoint((cf*CFrame.new(-size.X/2,-size.Y/2,-size.Z/2)).Position),BR=Camera:WorldToViewportPoint((cf*CFrame.new(size.X/2,-size.Y/2,-size.Z/2)).Position),},{
+TL=Camera:WorldToViewportPoint((cf*CFrame.new(-size.X/2,size.Y/2,size.Z/2)).Position),
+TR=Camera:WorldToViewportPoint((cf*CFrame.new(size.X/2,size.Y/2,size.Z/2)).Position),
+BL=Camera:WorldToViewportPoint((cf*CFrame.new(-size.X/2,-size.Y/2,size.Z/2)).Position),
+BR=Camera:WorldToViewportPoint((cf*CFrame.new(size.X/2,-size.Y/2,size.Z/2)).Position),
 }
 
-function i.CleanupESP()
-for j,k in ipairs(d:GetPlayers())do
-c:RemoveESP(i,k)
+if
+not(
+front.TL.Z>0
+and front.TR.Z>0
+and front.BL.Z>0
+and front.BR.Z>0
+and back.TL.Z>0
+and back.TR.Z>0
+and back.BL.Z>0
+and back.BR.Z>0
+)
+then
+for _,obj in pairs(esp.Box)do
+obj.Visible=false
 end
-i.Drawings.ESP={}
-i.Drawings.Skeleton={}
-i.Highlights={}
+return
 end
 
-function i:Load()end
 
-function i:Unload(j)end
+local function toVector2(v3)
+return Vector2.new(v3.X,v3.Y)
+end
+front.TL,front.TR=toVector2(front.TL),toVector2(front.TR)
+front.BL,front.BR=toVector2(front.BL),toVector2(front.BR)
+back.TL,back.TR=toVector2(back.TL),toVector2(back.TR)
+back.BL,back.BR=toVector2(back.BL),toVector2(back.BR)
 
-function i:BindESPToObject(j,k)end
 
-function i:EnablePlayerESP()end
+esp.Box.TopLeft.From=front.TL
+esp.Box.TopLeft.To=front.TR
+esp.Box.TopLeft.Visible=true
 
-function i:DisablePlayerESP()end
+esp.Box.TopRight.From=front.TR
+esp.Box.TopRight.To=front.BR
+esp.Box.TopRight.Visible=true
 
-return i
+esp.Box.BottomLeft.From=front.BL
+esp.Box.BottomLeft.To=front.BR
+esp.Box.BottomLeft.Visible=true
+
+esp.Box.BottomRight.From=front.TL
+esp.Box.BottomRight.To=front.BL
+esp.Box.BottomRight.Visible=true
+
+
+esp.Box.Left.From=back.TL
+esp.Box.Left.To=back.TR
+esp.Box.Left.Visible=true
+
+esp.Box.Right.From=back.TR
+esp.Box.Right.To=back.BR
+esp.Box.Right.Visible=true
+
+esp.Box.Top.From=back.BL
+esp.Box.Top.To=back.BR
+esp.Box.Top.Visible=true
+
+esp.Box.Bottom.From=back.TL
+esp.Box.Bottom.To=back.BL
+esp.Box.Bottom.Visible=true
+
+
+local function drawConnectingLine(from,to,visible)
+local line=Drawing.new("Line")
+line.Visible=visible
+line.Color=boxColor
+line.Thickness=Library.Settings.Box.Thickness
+line.From=from
+line.To=to
+return line
+end
+local function drawConnectingBox(pointa,pointb,pointc,pointd)
+local quad=Drawing.new("Quad")
+if Library.Settings.Box.Filled.Enabled then
+quad.Visible=true
+quad.Filled=true
+quad.Transparency=Library.Settings.Box.Filled.Transparency
+quad.Color=boxFillColor
+quad.PointA=pointa
+quad.PointB=pointb
+quad.PointC=pointc
+quad.PointD=pointd
+else
+quad.Visible=false
+end
+return quad
+end
+
+
+local connectors={
+drawConnectingLine(front.TL,back.TL,true),
+drawConnectingLine(front.TR,back.TR,true),
+drawConnectingLine(front.BL,back.BL,true),
+drawConnectingLine(front.BR,back.BR,true),
+drawConnectingBox(front.TL,front.TR,front.BL,front.BR),
+drawConnectingBox(back.TL,back.TR,back.BL,back.BR),
+drawConnectingBox(front.TL,back.TL,front.BL,back.BL),
+drawConnectingBox(front.TR,back.TR,front.BR,back.BR),
+drawConnectingBox(front.TR,back.TR,front.TL,back.TR),
+drawConnectingBox(front.BR,back.BR,front.BL,back.BR),
+}
+
+
+task.spawn(function()
+task.wait()
+for _,drawing in ipairs(connectors)do
+drawing:Remove()
+end
+end)
+else
+local function drawConnectingBox(pointa,pointb,pointc,pointd)
+local quad=Drawing.new("Quad")
+if Library.Settings.Box.Filled.Enabled then
+quad.Visible=true
+quad.Filled=true
+quad.Transparency=Library.Settings.Box.Filled.Transparency
+quad.Color=boxFillColor
+quad.PointA=pointa
+quad.PointB=pointb
+quad.PointC=pointc
+quad.PointD=pointd
+else
+quad.Visible=false
+end
+return quad
+end
+
+local connectors={
+drawConnectingBox(
+boxPosition,
+boxPosition+Vector2.new(boxSize.X,0),
+boxPosition+Vector2.new(0,boxSize.Y),
+boxPosition+Vector2.new(boxSize.X,boxSize.Y)
+),
+}
+if Library.Settings.Box.Style==1 then
+local cornerSize=boxWidth*0.2
+
+esp.Box.TopLeft.From=boxPosition
+esp.Box.TopLeft.To=boxPosition+Vector2.new(cornerSize,0)
+esp.Box.TopLeft.Visible=true
+
+esp.Box.TopRight.From=boxPosition+Vector2.new(boxSize.X,0)
+esp.Box.TopRight.To=boxPosition+Vector2.new(boxSize.X-cornerSize,0)
+esp.Box.TopRight.Visible=true
+
+esp.Box.BottomLeft.From=boxPosition+Vector2.new(0,boxSize.Y)
+esp.Box.BottomLeft.To=boxPosition+Vector2.new(cornerSize,boxSize.Y)
+esp.Box.BottomLeft.Visible=true
+
+esp.Box.BottomRight.From=boxPosition+Vector2.new(boxSize.X,boxSize.Y)
+esp.Box.BottomRight.To=boxPosition+Vector2.new(boxSize.X-cornerSize,boxSize.Y)
+esp.Box.BottomRight.Visible=true
+
+esp.Box.Left.From=boxPosition
+esp.Box.Left.To=boxPosition+Vector2.new(0,cornerSize)
+esp.Box.Left.Visible=true
+
+esp.Box.Right.From=boxPosition+Vector2.new(boxSize.X,0)
+esp.Box.Right.To=boxPosition+Vector2.new(boxSize.X,cornerSize)
+esp.Box.Right.Visible=true
+
+esp.Box.Top.From=boxPosition+Vector2.new(0,boxSize.Y)
+esp.Box.Top.To=boxPosition+Vector2.new(0,boxSize.Y-cornerSize)
+esp.Box.Top.Visible=true
+
+esp.Box.Bottom.From=boxPosition+Vector2.new(boxSize.X,boxSize.Y)
+esp.Box.Bottom.To=boxPosition+Vector2.new(boxSize.X,boxSize.Y-cornerSize)
+esp.Box.Bottom.Visible=true
+else
+esp.Box.Left.From=boxPosition
+esp.Box.Left.To=boxPosition+Vector2.new(0,boxSize.Y)
+esp.Box.Left.Visible=true
+
+esp.Box.Right.From=boxPosition+Vector2.new(boxSize.X,0)
+esp.Box.Right.To=boxPosition+Vector2.new(boxSize.X,boxSize.Y)
+esp.Box.Right.Visible=true
+
+esp.Box.Top.From=boxPosition
+esp.Box.Top.To=boxPosition+Vector2.new(boxSize.X,0)
+esp.Box.Top.Visible=true
+
+esp.Box.Bottom.From=boxPosition+Vector2.new(0,boxSize.Y)
+esp.Box.Bottom.To=boxPosition+Vector2.new(boxSize.X,boxSize.Y)
+esp.Box.Bottom.Visible=true
+
+esp.Box.TopLeft.Visible=false
+esp.Box.TopRight.Visible=false
+esp.Box.BottomLeft.Visible=false
+esp.Box.BottomRight.Visible=false
+end
+task.spawn(function()
+task.wait()
+for _,drawing in ipairs(connectors)do
+drawing:Remove()
+end
+end)
+end
+
+for _,obj in pairs(esp.Box)do
+if obj.Visible then
+obj.Color=boxColor
+obj.Thickness=Library.Settings.Box.Thickness
+end
+end
+end
+
+if Library.Settings.Tracer.Enabled[teamType]then
+esp.Tracer.From=utilities:GetTracerOrigin(Library)
+esp.Tracer.To=Vector2.new(pos.X,pos.Y)
+esp.Tracer.Color=tracerColor
+esp.Tracer.Visible=true
+else
+esp.Tracer.Visible=false
+end
+
+if Library.Settings.HealthBar.Enabled[teamType]then
+local health,
+maxHealth=humanoid.Health,humanoid.MaxHealth
+local healthPercent,
+
+barHeight,
+barWidth=health/maxHealth,screenSize*0.8,4
+local barPos=Vector2.new(boxPosition.X-barWidth-2,boxPosition.Y+(screenSize-barHeight)/2)
+
+if Library.Settings.HealthBar.Bar then
+esp.HealthBar.Outline.Size=Vector2.new(barWidth,barHeight)
+esp.HealthBar.Outline.Position=barPos
+esp.HealthBar.Outline.Visible=true
+esp.HealthBar.Outline.Color=healthOutlineColor
+
+esp.HealthBar.Fill.Size=Vector2.new(barWidth-2,barHeight*healthPercent)
+esp.HealthBar.Fill.Position=Vector2.new(barPos.X+1,barPos.Y+barHeight*(1-healthPercent))
+esp.HealthBar.Fill.Color=currentHealthColor
+esp.HealthBar.Fill.Visible=true
+else
+esp.HealthBar.Outline.Visible=false
+esp.HealthBar.Fill.Visible=false
+end
+
+if Library.Settings.HealthBar.Text then
+esp.HealthBar.Text.Text=math.floor(health)..Library.Settings.HealthBar.Suffix
+esp.HealthBar.Text.Position=Vector2.new(barPos.X+barWidth+2,barPos.Y+barHeight/2)
+esp.HealthBar.Text.Visible=true
+else
+esp.HealthBar.Text.Visible=false
+end
+else
+for _,obj in pairs(esp.HealthBar)do
+obj.Visible=false
+end
+end
+
+if Library.Settings.Name.Enabled[teamType]then
+esp.Info.Name.Text=Library.Settings.Name.Style==2 and player.Name or player.DisplayName
+esp.Info.Name.Position=Vector2.new(boxPosition.X+boxWidth/2,boxPosition.Y-20)
+esp.Info.Name.Color=textColor
+esp.Info.Name.Visible=true
+else
+esp.Info.Name.Visible=false
+end
+
+if Library.Settings.Snaplines then
+esp.Snapline.From=Vector2.new(Camera.ViewportSize.X/2,Camera.ViewportSize.Y)
+esp.Snapline.To=Vector2.new(pos.X,pos.Y)
+esp.Snapline.Color=boxColor
+esp.Snapline.Visible=true
+else
+esp.Snapline.Visible=false
+end
+
+local highlight=Library.Highlights[player]
+if highlight then
+if Library.Settings.Chams.Enabled[teamType]and character then
+highlight.Parent=character
+highlight.FillColor=chamsFillColor
+highlight.OutlineColor=chamsOutlineColor
+highlight.FillTransparency=Library.Settings.Chams.Fill.Enabled
+and Library.Settings.Chams.Fill.Transparency
+or 1
+highlight.OutlineTransparency=Library.Settings.Chams.Outline.Enabled
+and Library.Settings.Chams.Outline.Transparency
+or 1
+highlight.Enabled=true
+else
+highlight.Enabled=false
+end
+highlight.DepthMode=Library.Settings.Chams.Occlusion and Enum.HighlightDepthMode.Occluded
+or Enum.HighlightDepthMode.AlwaysOnTop
+end
+
+if Library.Settings.Skeleton.Enabled[teamType]then
+local function getBonePositions(character)
+if not character then
+return nil
+end
+
+local bones={
+Head=character:FindFirstChild("Head"),
+UpperTorso=character:FindFirstChild("UpperTorso")or character:FindFirstChild("Torso"),
+LowerTorso=character:FindFirstChild("LowerTorso")or character:FindFirstChild("Torso"),
+RootPart=character:FindFirstChild("HumanoidRootPart"),
+
+
+LeftUpperArm=character:FindFirstChild("LeftUpperArm")or character:FindFirstChild("Left Arm"),
+LeftLowerArm=character:FindFirstChild("LeftLowerArm")or character:FindFirstChild("Left Arm"),
+LeftHand=character:FindFirstChild("LeftHand")or character:FindFirstChild("Left Arm"),
+
+
+RightUpperArm=character:FindFirstChild("RightUpperArm")or character:FindFirstChild("Right Arm"),
+RightLowerArm=character:FindFirstChild("RightLowerArm")or character:FindFirstChild("Right Arm"),
+RightHand=character:FindFirstChild("RightHand")or character:FindFirstChild("Right Arm"),
+
+
+LeftUpperLeg=character:FindFirstChild("LeftUpperLeg")or character:FindFirstChild("Left Leg"),
+LeftLowerLeg=character:FindFirstChild("LeftLowerLeg")or character:FindFirstChild("Left Leg"),
+LeftFoot=character:FindFirstChild("LeftFoot")or character:FindFirstChild("Left Leg"),
+
+
+RightUpperLeg=character:FindFirstChild("RightUpperLeg")or character:FindFirstChild("Right Leg"),
+RightLowerLeg=character:FindFirstChild("RightLowerLeg")or character:FindFirstChild("Right Leg"),
+RightFoot=character:FindFirstChild("RightFoot")or character:FindFirstChild("Right Leg"),
+}
+
+
+if not(bones.Head and bones.UpperTorso)then
+return nil
+end
+
+return bones
+end
+
+local function drawBone(from,to,line)
+if not from or not to then
+line.Visible=false
+return
+end
+
+
+local fromPos,
+toPos=(from.CFrame*CFrame.new(0,0,0)).Position,(to.CFrame*CFrame.new(0,0,0)).Position
+
+
+local fromScreen,fromVisible=Camera:WorldToViewportPoint(fromPos)
+local toScreen,toVisible=Camera:WorldToViewportPoint(toPos)
+
+
+if not(fromVisible and toVisible)or fromScreen.Z<0 or toScreen.Z<0 then
+line.Visible=false
+return
+end
+
+
+local screenBounds=Camera.ViewportSize
+if
+fromScreen.X<0
+or fromScreen.X>screenBounds.X
+or fromScreen.Y<0
+or fromScreen.Y>screenBounds.Y
+or toScreen.X<0
+or toScreen.X>screenBounds.X
+or toScreen.Y<0
+or toScreen.Y>screenBounds.Y
+then
+line.Visible=false
+return
+end
+
+
+line.From=Vector2.new(fromScreen.X,fromScreen.Y)
+line.To=Vector2.new(toScreen.X,toScreen.Y)
+line.Color=skeletonColor
+line.Thickness=Library.Settings.Skeleton.Thickness
+line.Transparency=Library.Settings.Skeleton.Transparency
+line.Visible=true
+end
+
+local bones=getBonePositions(character)
+if bones then
+local skeleton=Library.Drawings.Skeleton[player]
+if skeleton then
+
+drawBone(bones.Head,bones.UpperTorso,skeleton.Head)
+drawBone(bones.UpperTorso,bones.LowerTorso,skeleton.UpperSpine)
+
+
+drawBone(bones.UpperTorso,bones.LeftUpperArm,skeleton.LeftShoulder)
+drawBone(bones.LeftUpperArm,bones.LeftLowerArm,skeleton.LeftUpperArm)
+drawBone(bones.LeftLowerArm,bones.LeftHand,skeleton.LeftLowerArm)
+
+
+drawBone(bones.UpperTorso,bones.RightUpperArm,skeleton.RightShoulder)
+drawBone(bones.RightUpperArm,bones.RightLowerArm,skeleton.RightUpperArm)
+drawBone(bones.RightLowerArm,bones.RightHand,skeleton.RightLowerArm)
+
+
+drawBone(bones.LowerTorso,bones.LeftUpperLeg,skeleton.LeftHip)
+drawBone(bones.LeftUpperLeg,bones.LeftLowerLeg,skeleton.LeftUpperLeg)
+drawBone(bones.LeftLowerLeg,bones.LeftFoot,skeleton.LeftLowerLeg)
+
+
+drawBone(bones.LowerTorso,bones.RightUpperLeg,skeleton.RightHip)
+drawBone(bones.RightUpperLeg,bones.RightLowerLeg,skeleton.RightUpperLeg)
+drawBone(bones.RightLowerLeg,bones.RightFoot,skeleton.RightLowerLeg)
+end
+end
+else
+local skeleton=Library.Drawings.Skeleton[player]
+if skeleton then
+for _,line in pairs(skeleton)do
+line.Visible=false
+end
+end
+end
+end
+
+return playerEsp end function __DARKLUA_BUNDLE_MODULES.c()local v=__DARKLUA_BUNDLE_MODULES.cache.c if not v then v={c=__modImpl()}__DARKLUA_BUNDLE_MODULES.cache.c=v end return v.c end end end
+
+local services,
+playerEsp=__DARKLUA_BUNDLE_MODULES.a(),__DARKLUA_BUNDLE_MODULES.c()
+
+local Players,
+RunService,
+UserInputService,
+Camera=services.Players,services.RunService,services.UserInputService,workspace.CurrentCamera
+local LocalPlayer,
+
+Twilight,
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+isAlreadyUnloaded=Players.LocalPlayer,{Settings={Enabled=false,Checks={Visible={Enabled=false,OnlyVisible=false,Recolor=false,},Team={Enabled=false,SelectedTeams={enemy=false,friendly=false,generic=false,self=false,},},},currentColors={generic={Box={Outline={Visible=Color3.new(1,1,1),Invisible=Color3.new(1,1,1),},Fill={Visible=Color3.new(1,1,1),Invisible=Color3.new(1,1,1),},},HealthBar={Outline=Color3.new(1,1,1),Fills={Low=Color3.new(1,1,1),Medium=Color3.new(1,1,1),High=Color3.new(1,1,1),},},Tracer={Visible=Color3.new(1,1,1),Invisible=Color3.new(1,1,1),},Text=Color3.new(1,1,1),Chams={Outline={Visible=Color3.new(1,1,1),Invisible=Color3.new(1,1,1),},Fill={Visible=Color3.new(1,1,1),Invisible=Color3.new(1,1,1),},},Skeleton={Visible=Color3.new(1,1,1),Invisible=Color3.new(1,1,1),},},friendly={Box={Outline={Visible=Color3.new(1,1,1),Invisible=Color3.new(1,1,1),},Fill={Visible=Color3.new(1,1,1),Invisible=Color3.new(1,1,1),},},healthBar={Outline=Color3.new(1,1,1),Fills={Low=Color3.new(1,1,1),Medium=Color3.new(1,1,1),High=Color3.new(1,1,1),},},Tracer={Visible=Color3.new(1,1,1),Invisible=Color3.new(1,1,1),},Text=Color3.new(1,1,1),Chams={Outline={Visible=Color3.new(1,1,1),Invisible=Color3.new(1,1,1),},Fill={Visible=Color3.new(1,1,1),Invisible=Color3.new(1,1,1),},},Skeleton={Visible=Color3.new(1,1,1),Invisible=Color3.new(1,1,1),},},enemy={Box={Outline={Visible=Color3.new(1,1,1),Invisible=Color3.new(1,1,1),},Fill={Visible=Color3.new(1,1,1),Invisible=Color3.new(1,1,1),},},healthBar={Outline=Color3.new(1,1,1),Fills={Low=Color3.new(1,1,1),Medium=Color3.new(1,1,1),High=Color3.new(1,1,1),},},Tracer={Visible=Color3.new(1,1,1),Invisible=Color3.new(1,1,1),},Text=Color3.new(1,1,1),Chams={Outline={Visible=Color3.new(1,1,1),Invisible=Color3.new(1,1,1),},Fill={Visible=Color3.new(1,1,1),Invisible=Color3.new(1,1,1),},},Skeleton={Visible=Color3.new(1,1,1),Invisible=Color3.new(1,1,1),},},["self"]={Box={Outline={Visible=Color3.new(1,1,1),Invisible=Color3.new(1,1,1),},Fill={Visible=Color3.new(1,1,1),Invisible=Color3.new(1,1,1),},},healthBar={Outline=Color3.new(1,1,1),Fills={Low=Color3.new(1,1,1),Medium=Color3.new(1,1,1),High=Color3.new(1,1,1),},},Tracer={Visible=Color3.new(1,1,1),Invisible=Color3.new(1,1,1),},Text=Color3.new(1,1,1),Chams={Outline={Visible=Color3.new(1,1,1),Invisible=Color3.new(1,1,1),},Fill={Visible=Color3.new(1,1,1),Invisible=Color3.new(1,1,1),},},Skeleton={Visible=Color3.new(1,1,1),Invisible=Color3.new(1,1,1),},},},HealthBar={Enabled={enemy=false,friendly=false,self=false,generic=false,},Bar=false,Text=false,Position=1,Suffix="HP",},Box={Style=1,Enabled=false,Filled={Enabled=false,Transparency=0.6,},Thickness=1,},Tracer={Enabled={enemy=false,friendly=false,generic=false,},Origin=1,Style=1,Thickness=1,},Name={Enabled={enemy=false,friendly=false,self=false,generic=false,},Style=1,},Distance={Enabled={enemy=false,friendly=false,self=false,generic=false,},DistanceUnit=1,},Chams={Enabled={enemy=false,friendly=false,self=false,generic=false,},Outline={Enabled=true,Thickness=0.1,Transparency=0,},Fill={Enabled=true,Transparency=0.5,},Occlusion=false,},Skeleton={Enabled={enemy=false,friendly=false,self=false,generic=false,},Thickness=1,Transparency=1,ExplicitBodyType=nil,},TextSize=14,MaxDistance=2000,RefreshRate=8.333333333333334E-3,Snaplines=true,},Drawings={ESP={},Tracers={},Boxes={},Healthbars={},Names={},Distances={},Snaplines={},Skeleton={},ObjectESPs={},},Highlights={},_connections={},},false
+function Twilight:Load()
+Twilight.Settings.Enabled=true
+isAlreadyUnloaded=false
+end
+
+function Twilight:Unload(destroy)
+Twilight.Settings.Enabled=false
+isAlreadyUnloaded=true
+if destroy then
+for _,player in ipairs(Players:GetPlayers())do
+playerEsp:RemoveESP(Twilight,player)
+end
+Twilight.Drawings.ESP={}
+Twilight.Drawings.Skeleton={}
+Twilight.Highlights={}
+for _,connection in pairs(Twilight._connections)do
+connection:Disconnect()
+connection=nil
+end
+else
+for _,player in ipairs(Players:GetPlayers())do
+local esp=Twilight.Drawings.ESP[player]
+if esp then
+for _,obj in pairs(esp.Box)do
+obj.Visible=false
+end
+esp.Tracer.Visible=false
+for _,obj in pairs(esp.HealthBar)do
+obj.Visible=false
+end
+for _,obj in pairs(esp.Info)do
+obj.Visible=false
+end
+esp.Snapline.Visible=false
+end
+
+
+local skeleton=Twilight.Drawings.Skeleton[player]
+if skeleton then
+for _,line in pairs(skeleton)do
+line.Visible=false
+end
+end
+end
+end
+end
+
+function Twilight:BindESPToObject(object,rootPart)end
+
+local lastUpdate=0
+table.insert(
+Twilight._connections,
+RunService.RenderStepped:Connect(function()
+if not Twilight.Settings.Enabled then
+if not isAlreadyUnloaded then
+Twilight:Unload(false)
+end
+return
+end
+
+local currentTime=tick()
+if currentTime-lastUpdate>=Twilight.Settings.RefreshRate then
+for _,player in ipairs(Players:GetPlayers())do
+if player~=LocalPlayer then
+if not Twilight.Drawings.ESP[player]then
+playerEsp:CreateESP(Twilight,player)
+end
+playerEsp:UpdateESP(Twilight,player)
+end
+end
+lastUpdate=currentTime
+end
+end)
+)
+
+table.insert(
+Twilight._connections,
+Players.PlayerAdded:Connect(function(player)
+playerEsp:CreateESP(Twilight,player)
+end)
+)
+table.insert(
+Twilight._connections,
+Players.PlayerRemoving:Connect(function(player)
+playerEsp:RemoveESP(Twilight,player)
+end)
+)
+
+for _,player in ipairs(Players:GetPlayers())do
+playerEsp:CreateESP(Twilight,player)
+end
+
+function Twilight:EnablePlayerESP()end
+
+function Twilight:DisablePlayerESP()end
+
+return Twilight

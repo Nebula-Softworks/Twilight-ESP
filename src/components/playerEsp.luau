@@ -43,7 +43,7 @@ function playerEsp:CreateESP(Library, Player)
 	local tracer = Drawing.new("Line")
 	tracer.Visible = false
 	tracer.Color = Library.Settings.currentColors[teamType].Tracer.Visible
-	tracer.Thickness = Library.Settings.Tracers.Thickness
+	tracer.Thickness = Library.Settings.Tracer.Thickness
 
 	local healthBar = {
 		Outline = Drawing.new("Square"),
@@ -61,16 +61,19 @@ function playerEsp:CreateESP(Library, Player)
 		else
 			healthtype = "Low"
 		end
+		if not Library.Settings.currentColors[teamType].HealthBar then
+			continue
+		end
 		if obj == healthBar.Fill then
-			obj.Color = Library.Settings.currentColors[teamType].healthBar.Fills[healthtype]
+			obj.Color = Library.Settings.currentColors[teamType].HealthBar.Fills[healthtype]
 			obj.Filled = true
 		elseif obj == healthBar.Text then
 			obj.Center = true
 			obj.Size = Library.Settings.TextSize
-			obj.Color = Library.Settings.currentColors[teamType].healthBar.Fills[healthtype]
+			obj.Color = Library.Settings.currentColors[teamType].HealthBar.Fills[healthtype]
 			obj.Font = 2
 		else
-			obj.Color = Library.Settings.currentColors[teamType].healthBar.Outline
+			print(teamType)
 			obj.Filled = false
 		end
 	end
@@ -91,16 +94,16 @@ function playerEsp:CreateESP(Library, Player)
 
 	local snapline = Drawing.new("Line")
 	snapline.Visible = false
-	snapline.Color = Library.Settings.currentColors[teamType].Box.Outline
+	snapline.Color = Library.Settings.currentColors[teamType].Box.Outline.Visible
 	snapline.Thickness = 1
 
 	local highlight = Instance.new("Highlight")
 	highlight.FillColor = Library.Settings.currentColors[teamType].Chams.Fill.Visible
 	highlight.OutlineColor = Library.Settings.currentColors[teamType].Chams.Outline.Visible
 	highlight.FillTransparency = Library.Settings.Chams.Fill.Transparency
-	highlight.OutlineTransparency = Library.Settings.Chams.Oultine.Transparency
+	highlight.OutlineTransparency = Library.Settings.Chams.Outline.Transparency
 	highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
-	highlight.Enabled = Library.Settings.Chams.Enabled[teamType]
+	highlight.Enabled = false
 
 	Library.Highlights[Player] = highlight
 
@@ -362,15 +365,15 @@ function playerEsp:UpdateESP(Library, player)
 		end
 	end
 
-	local boxColor = utilities:GetPlayerColor(player, isVisible, "Box", "Outline")
-	local boxFillColor = utilities:GetPlayerColor(player, isVisible, "Box", "Fill")
-	local tracerColor = utilities:GetPlayerColor(player, isVisible, "Tracer")
-	local textColor = utilities:GetPlayerColor(player, isVisible, "Text")
-	local skeletonColor = utilities:GetPlayerColor(player, isVisible, "Skeleton")
-	local chamsOutlineColor = utilities:GetPlayerColor(player, isVisible, "Chams", "Outline")
-	local chamsFillColor = utilities:GetPlayerColor(player, isVisible, "Chams", "Fill")
-	local currentHealthColor = utilities:GetPlayerColor(player, isVisible, "HealthBar", "Fill")
-	local healthOutlineColor = utilities:GetPlayerColor(player, isVisible, "HealthBar", "Outline")
+	local boxColor = utilities:GetPlayerColor(Library, player, isVisible, "Box", "Outline")
+	local boxFillColor = utilities:GetPlayerColor(Library, player, isVisible, "Box", "Fill")
+	local tracerColor = utilities:GetPlayerColor(Library, player, isVisible, "Tracer")
+	local textColor = utilities:GetPlayerColor(Library, player, isVisible, "Text")
+	local skeletonColor = utilities:GetPlayerColor(Library, player, isVisible, "Skeleton")
+	local chamsOutlineColor = utilities:GetPlayerColor(Library, player, isVisible, "Chams", "Outline")
+	local chamsFillColor = utilities:GetPlayerColor(Library, player, isVisible, "Chams", "Fill")
+	local currentHealthColor = utilities:GetPlayerColor(Library, player, isVisible, "HealthBar", "Fill")
+	local healthOutlineColor = utilities:GetPlayerColor(Library, player, isVisible, "HealthBar", "Outline")
 	local size = character:GetExtentsSize()
 	local cf = rootPart.CFrame
 
@@ -618,7 +621,7 @@ function playerEsp:UpdateESP(Library, player)
 	end
 
 	if Library.Settings.Tracer.Enabled[teamType] then
-		esp.Tracer.From = utilities:GetTracerOrigin()
+		esp.Tracer.From = utilities:GetTracerOrigin(Library)
 		esp.Tracer.To = Vector2.new(pos.X, pos.Y)
 		esp.Tracer.Color = tracerColor
 		esp.Tracer.Visible = true
