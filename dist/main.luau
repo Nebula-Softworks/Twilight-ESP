@@ -6,8 +6,9 @@
 	by Nebula Softworks
 
 
-	hunt3r | Designing + Programming
-	cyclic@luau.software | Helping hunt3r with OCD issues
+	hunt3r/Nebula Softworks | Designing + Programming
+	cyclic@luau.software | Helping with Project Setup
+	check the github for more credits.
 	
     
 	Licensed Under CC-BY-NC 4.0 License
@@ -50,9 +51,11 @@ elseif origin==4 then
 return Vector2.new(Camera.ViewportSize.X/2,Camera.ViewportSize.Y/2)
 elseif origin==5 then
 return UserInputService:GetMouseLocation()
-else
+elseif origin==1 then
 local v3=Camera:WorldToViewportPoint(LocalPlayer.Character.HumanoidRootPart.Position)
 return Vector2.new(v3.X,v3.Y)
+else
+return nil
 end
 end
 
@@ -69,7 +72,7 @@ end
 end
 
 if Player==LocalPlayer then
-teamType="self"
+teamType="local"
 end
 return teamType
 end
@@ -87,7 +90,7 @@ end
 end
 
 if Player==LocalPlayer then
-teamType="self"
+teamType="local"
 end
 
 if part=="HealthBar"and additional=="Fill"then
@@ -101,7 +104,8 @@ currentStatus="Medium"
 else
 currentStatus="Low"
 end
-return root.Settings.currentColors[teamType].HealthBar.Fills[currentStatus]
+return root.Settings.currentColors[teamType].HealthBar
+and root.Settings.currentColors[teamType].HealthBar.Fills[currentStatus]
 elseif part=="HealthBar"or part=="Text"then
 return root.Settings.currentColors[teamType][part]
 end
@@ -189,16 +193,13 @@ for _,line in pairs(box)do
 line.Visible=false
 line.Color=Library.Settings.currentColors[teamType].Box.Outline.Visible
 line.Thickness=Library.Settings.Box.Thickness
-if line==box.Fill then
-line.Filled=true
-line.Transparency=Library.Settings.Box.Filled.Transparency
-end
 end
 
 local tracer=Drawing.new("Line")
 tracer.Visible=false
 tracer.Color=Library.Settings.currentColors[teamType].Tracer.Visible
 tracer.Thickness=Library.Settings.Tracer.Thickness
+tracer.From=utilities:GetTracerOrigin(Library)
 
 local healthBar={
 Outline=Drawing.new("Square"),
@@ -209,12 +210,20 @@ Text=Drawing.new("Text"),
 for _,obj in pairs(healthBar)do
 obj.Visible=false
 local healthtype
-if Player.Character.Humanoid.Health/Player.Character.Humanoid.MaxHealth>0.6 then
+repeat
+task.wait()
+until Player.Character
+local humanoid=Player.Character:FindFirstChild("Humanoid")
+if humanoid then
+if humanoid.Health/humanoid.MaxHealth>0.6 then
 healthtype="High"
-elseif Player.Character.Humanoid.Health/Player.Character.Humanoid.MaxHealth>0.2 then
+elseif humanoid.Health/humanoid.MaxHealth>0.2 then
 healthtype="Medium"
 else
 healthtype="Low"
+end
+else
+healthtype="High"
 end
 if not Library.Settings.currentColors[teamType].HealthBar then
 continue
@@ -378,8 +387,9 @@ end
 return
 end
 
-local rootPart=character:FindFirstChild("HumanoidRootPart")
-if not rootPart then
+local rootPart,
+humanoid=character:FindFirstChild("HumanoidRootPart"),character:FindFirstChild("Humanoid")
+if not rootPart or not humanoid then
 
 for _,obj in pairs(esp.Box)do
 obj.Visible=false
@@ -426,7 +436,6 @@ end
 return
 end
 
-local humanoid=character:FindFirstChild("Humanoid")
 if not humanoid or humanoid.Health<=0 then
 for _,obj in pairs(esp.Box)do
 obj.Visible=false
@@ -504,7 +513,7 @@ end
 local teamType=utilities:GetPlayerType(player)
 
 if Library.Settings.Checks.Team.Enabled then
-if Library.Settings.Checks.Team.SelectedTeams[teamType]==false then
+if not Library.Settings.Checks.Team.SelectedTeams[teamType]then
 for _,obj in pairs(esp.Box)do
 obj.Visible=false
 end
@@ -648,8 +657,8 @@ quad.Transparency=Library.Settings.Box.Filled.Transparency
 quad.Color=boxFillColor
 quad.PointA=pointa
 quad.PointB=pointb
-quad.PointC=pointc
-quad.PointD=pointd
+quad.PointD=pointc
+quad.PointC=pointd
 else
 quad.Visible=false
 end
@@ -671,8 +680,8 @@ drawConnectingBox(front.BR,back.BR,front.BL,back.BR),
 }
 
 
-task.spawn(function()
-task.wait()
+task.defer(function()
+task.wait(Library.Settings.Framerate or 6.944444444444444E-3)
 for _,drawing in ipairs(connectors)do
 drawing:Remove()
 end
@@ -687,8 +696,8 @@ quad.Transparency=Library.Settings.Box.Filled.Transparency
 quad.Color=boxFillColor
 quad.PointA=pointa
 quad.PointB=pointb
-quad.PointC=pointc
-quad.PointD=pointd
+quad.PointD=pointc
+quad.PointC=pointd
 else
 quad.Visible=false
 end
@@ -834,8 +843,6 @@ if Library.Settings.Snaplines then
 esp.Snapline.From=Vector2.new(Camera.ViewportSize.X/2,Camera.ViewportSize.Y)
 esp.Snapline.To=Vector2.new(pos.X,pos.Y)
 esp.Snapline.Color=boxColor
-esp.Snapline.Visible=true
-else
 esp.Snapline.Visible=false
 end
 
@@ -995,339 +1002,328 @@ UserInputService,
 Camera=services.Players,services.RunService,services.UserInputService,workspace.CurrentCamera
 local LocalPlayer,
 
-Twilight,
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-isAlreadyUnloaded=Players.LocalPlayer,{Settings={Enabled=false,Checks={Visible={Enabled=false,OnlyVisible=false,Recolor=false,},Team={Enabled=false,SelectedTeams={enemy=false,friendly=false,generic=false,self=false,},},},currentColors={generic={Box={Outline={Visible=Color3.new(1,1,1),Invisible=Color3.new(1,1,1),},Fill={Visible=Color3.new(1,1,1),Invisible=Color3.new(1,1,1),},},HealthBar={Outline=Color3.new(1,1,1),Fills={Low=Color3.new(1,1,1),Medium=Color3.new(1,1,1),High=Color3.new(1,1,1),},},Tracer={Visible=Color3.new(1,1,1),Invisible=Color3.new(1,1,1),},Text=Color3.new(1,1,1),Chams={Outline={Visible=Color3.new(1,1,1),Invisible=Color3.new(1,1,1),},Fill={Visible=Color3.new(1,1,1),Invisible=Color3.new(1,1,1),},},Skeleton={Visible=Color3.new(1,1,1),Invisible=Color3.new(1,1,1),},},friendly={Box={Outline={Visible=Color3.new(1,1,1),Invisible=Color3.new(1,1,1),},Fill={Visible=Color3.new(1,1,1),Invisible=Color3.new(1,1,1),},},healthBar={Outline=Color3.new(1,1,1),Fills={Low=Color3.new(1,1,1),Medium=Color3.new(1,1,1),High=Color3.new(1,1,1),},},Tracer={Visible=Color3.new(1,1,1),Invisible=Color3.new(1,1,1),},Text=Color3.new(1,1,1),Chams={Outline={Visible=Color3.new(1,1,1),Invisible=Color3.new(1,1,1),},Fill={Visible=Color3.new(1,1,1),Invisible=Color3.new(1,1,1),},},Skeleton={Visible=Color3.new(1,1,1),Invisible=Color3.new(1,1,1),},},enemy={Box={Outline={Visible=Color3.new(1,1,1),Invisible=Color3.new(1,1,1),},Fill={Visible=Color3.new(1,1,1),Invisible=Color3.new(1,1,1),},},healthBar={Outline=Color3.new(1,1,1),Fills={Low=Color3.new(1,1,1),Medium=Color3.new(1,1,1),High=Color3.new(1,1,1),},},Tracer={Visible=Color3.new(1,1,1),Invisible=Color3.new(1,1,1),},Text=Color3.new(1,1,1),Chams={Outline={Visible=Color3.new(1,1,1),Invisible=Color3.new(1,1,1),},Fill={Visible=Color3.new(1,1,1),Invisible=Color3.new(1,1,1),},},Skeleton={Visible=Color3.new(1,1,1),Invisible=Color3.new(1,1,1),},},["self"]={Box={Outline={Visible=Color3.new(1,1,1),Invisible=Color3.new(1,1,1),},Fill={Visible=Color3.new(1,1,1),Invisible=Color3.new(1,1,1),},},healthBar={Outline=Color3.new(1,1,1),Fills={Low=Color3.new(1,1,1),Medium=Color3.new(1,1,1),High=Color3.new(1,1,1),},},Tracer={Visible=Color3.new(1,1,1),Invisible=Color3.new(1,1,1),},Text=Color3.new(1,1,1),Chams={Outline={Visible=Color3.new(1,1,1),Invisible=Color3.new(1,1,1),},Fill={Visible=Color3.new(1,1,1),Invisible=Color3.new(1,1,1),},},Skeleton={Visible=Color3.new(1,1,1),Invisible=Color3.new(1,1,1),},},},HealthBar={Enabled={enemy=false,friendly=false,self=false,generic=false,},Bar=false,Text=false,Position=1,Suffix="HP",},Box={Style=1,Enabled=false,Filled={Enabled=false,Transparency=0.6,},Thickness=1,},Tracer={Enabled={enemy=false,friendly=false,generic=false,},Origin=1,Style=1,Thickness=1,},Name={Enabled={enemy=false,friendly=false,self=false,generic=false,},Style=1,},Distance={Enabled={enemy=false,friendly=false,self=false,generic=false,},DistanceUnit=1,},Chams={Enabled={enemy=false,friendly=false,self=false,generic=false,},Outline={Enabled=true,Thickness=0.1,Transparency=0,},Fill={Enabled=true,Transparency=0.5,},Occlusion=false,},Skeleton={Enabled={enemy=false,friendly=false,self=false,generic=false,},Thickness=1,Transparency=1,ExplicitBodyType=nil,},TextSize=14,MaxDistance=2000,RefreshRate=8.333333333333334E-3,Snaplines=true,},Drawings={ESP={},Tracers={},Boxes={},Healthbars={},Names={},Distances={},Snaplines={},Skeleton={},ObjectESPs={},},Highlights={},_connections={},},false
-function Twilight:Load()
-Twilight.Settings.Enabled=true
-isAlreadyUnloaded=false
-end
-
-function Twilight:Unload(destroy)
-Twilight.Settings.Enabled=false
-isAlreadyUnloaded=true
-if destroy then
+Twilight=Players.LocalPlayer,{
+Settings={
+
+
+Enabled=false,
+Checks={
+Visible={
+Enabled=false,
+OnlyVisible=false,
+Recolor=false,
+},
+Team={
+Enabled=false,
+SelectedTeams={
+enemy=false,
+friendly=false,
+generic=false,
+["local"]=false,
+},
+},
+},
+
+currentColors={
+generic={
+Box={
+Outline={
+Visible=Color3.new(1,1,1),
+Invisible=Color3.new(1,1,1),
+},
+Fill={
+Visible=Color3.new(1,1,1),
+Invisible=Color3.new(1,1,1),
+},
+},
+
+HealthBar={
+Outline=Color3.new(1,1,1),
+Fills={
+Low=Color3.new(1,1,1),
+Medium=Color3.new(1,1,1),
+High=Color3.new(1,1,1),
+},
+},
+
+Tracer={
+Visible=Color3.new(1,1,1),
+Invisible=Color3.new(1,1,1),
+},
+
+Text=Color3.new(1,1,1),
+
+Chams={
+Outline={
+Visible=Color3.new(1,1,1),
+Invisible=Color3.new(1,1,1),
+},
+Fill={
+Visible=Color3.new(1,1,1),
+Invisible=Color3.new(1,1,1),
+},
+},
+
+Skeleton={
+Visible=Color3.new(1,1,1),
+Invisible=Color3.new(1,1,1),
+},
+},
+friendly={
+Box={
+Outline={
+Visible=Color3.new(1,1,1),
+Invisible=Color3.new(1,1,1),
+},
+Fill={
+Visible=Color3.new(1,1,1),
+Invisible=Color3.new(1,1,1),
+},
+},
+
+healthBar={
+Outline=Color3.new(1,1,1),
+Fills={
+Low=Color3.new(1,1,1),
+Medium=Color3.new(1,1,1),
+High=Color3.new(1,1,1),
+},
+},
+
+Tracer={
+Visible=Color3.new(1,1,1),
+Invisible=Color3.new(1,1,1),
+},
+
+Text=Color3.new(1,1,1),
+
+Chams={
+Outline={
+Visible=Color3.new(1,1,1),
+Invisible=Color3.new(1,1,1),
+},
+Fill={
+Visible=Color3.new(1,1,1),
+Invisible=Color3.new(1,1,1),
+},
+},
+
+Skeleton={
+Visible=Color3.new(1,1,1),
+Invisible=Color3.new(1,1,1),
+},
+},
+enemy={
+Box={
+Outline={
+Visible=Color3.new(1,1,1),
+Invisible=Color3.new(1,1,1),
+},
+Fill={
+Visible=Color3.new(1,1,1),
+Invisible=Color3.new(1,1,1),
+},
+},
+
+healthBar={
+Outline=Color3.new(1,1,1),
+Fills={
+Low=Color3.new(1,1,1),
+Medium=Color3.new(1,1,1),
+High=Color3.new(1,1,1),
+},
+},
+
+Tracer={
+Visible=Color3.new(1,1,1),
+Invisible=Color3.new(1,1,1),
+},
+
+Text=Color3.new(1,1,1),
+
+Chams={
+Outline={
+Visible=Color3.new(1,1,1),
+Invisible=Color3.new(1,1,1),
+},
+Fill={
+Visible=Color3.new(1,1,1),
+Invisible=Color3.new(1,1,1),
+},
+},
+
+Skeleton={
+Visible=Color3.new(1,1,1),
+Invisible=Color3.new(1,1,1),
+},
+},
+["local"]={
+Box={
+Outline={
+Visible=Color3.new(1,1,1),
+Invisible=Color3.new(1,1,1),
+},
+Fill={
+Visible=Color3.new(1,1,1),
+Invisible=Color3.new(1,1,1),
+},
+},
+
+healthBar={
+Outline=Color3.new(1,1,1),
+Fills={
+Low=Color3.new(1,1,1),
+Medium=Color3.new(1,1,1),
+High=Color3.new(1,1,1),
+},
+},
+
+Tracer={
+Visible=Color3.new(1,1,1),
+Invisible=Color3.new(1,1,1),
+},
+
+Text=Color3.new(1,1,1),
+
+Chams={
+Outline={
+Visible=Color3.new(1,1,1),
+Invisible=Color3.new(1,1,1),
+},
+Fill={
+Visible=Color3.new(1,1,1),
+Invisible=Color3.new(1,1,1),
+},
+},
+
+Skeleton={
+Visible=Color3.new(1,1,1),
+Invisible=Color3.new(1,1,1),
+},
+},
+},
+
+HealthBar={
+Enabled={
+enemy=false,
+friendly=false,
+["local"]=false,
+generic=false,
+},
+
+Bar=false,
+Text=false,
+
+Position=1,
+Suffix="HP",
+},
+
+Box={
+Style=1,
+Enabled=false,
+Filled={
+Enabled=false,
+Transparency=0.6,
+},
+Thickness=1,
+},
+
+Tracer={
+Enabled={
+enemy=false,
+friendly=false,
+generic=false,
+},
+Origin=1,
+Style=1,
+Thickness=1,
+},
+
+Name={
+Enabled={
+enemy=false,
+friendly=false,
+["local"]=false,
+generic=false,
+},
+
+Style=1,
+},
+Distance={
+Enabled={
+enemy=false,
+friendly=false,
+["local"]=false,
+generic=false,
+},
+DistanceUnit=1,
+},
+
+Chams={
+Enabled={
+enemy=false,
+friendly=false,
+["local"]=false,
+generic=false,
+},
+Outline={
+Enabled=true,
+Thickness=0.1,
+Transparency=0,
+},
+Fill={
+Enabled=true,
+Transparency=0.5,
+},
+Occlusion=false,
+},
+
+Skeleton={
+Enabled={
+enemy=false,
+friendly=false,
+["local"]=false,
+generic=false,
+},
+Thickness=1,
+Transparency=1,
+ExplicitBodyType=nil,
+},
+
+TextSize=14,
+MaxDistance=2000,
+RefreshRate=8.333333333333334E-3,
+
+Snaplines=true,
+},
+
+Drawings={
+ESP={},
+Tracers={},
+Boxes={},
+Healthbars={},
+Names={},
+Distances={},
+Snaplines={},
+Skeleton={},
+
+ObjectESPs={},
+},
+Highlights={},
+
+_connections={},
+}
+
+function Twilight:Unload()
 for _,player in ipairs(Players:GetPlayers())do
 playerEsp:RemoveESP(Twilight,player)
 end
 Twilight.Drawings.ESP={}
 Twilight.Drawings.Skeleton={}
 Twilight.Highlights={}
-for _,connection in pairs(Twilight._connections)do
-connection:Disconnect()
-connection=nil
 end
-else
+
+function Twilight:DisablePlayerESP()
 for _,player in ipairs(Players:GetPlayers())do
 local esp=Twilight.Drawings.ESP[player]
 if esp then
@@ -1353,7 +1349,6 @@ end
 end
 end
 end
-end
 
 function Twilight:BindESPToObject(object,rootPart)end
 
@@ -1362,21 +1357,17 @@ table.insert(
 Twilight._connections,
 RunService.RenderStepped:Connect(function()
 if not Twilight.Settings.Enabled then
-if not isAlreadyUnloaded then
-Twilight:Unload(false)
-end
+Twilight:DisablePlayerESP()
 return
 end
 
 local currentTime=tick()
 if currentTime-lastUpdate>=Twilight.Settings.RefreshRate then
 for _,player in ipairs(Players:GetPlayers())do
-if player~=LocalPlayer then
 if not Twilight.Drawings.ESP[player]then
 playerEsp:CreateESP(Twilight,player)
 end
 playerEsp:UpdateESP(Twilight,player)
-end
 end
 lastUpdate=currentTime
 end
@@ -1401,7 +1392,5 @@ playerEsp:CreateESP(Twilight,player)
 end
 
 function Twilight:EnablePlayerESP()end
-
-function Twilight:DisablePlayerESP()end
 
 return Twilight

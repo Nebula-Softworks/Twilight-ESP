@@ -20,6 +20,8 @@ function functions:GetTracerOrigin(root)
 	elseif origin == 1 then
 		local v3 = Camera:WorldToViewportPoint(LocalPlayer.Character.HumanoidRootPart.Position)
 		return Vector2.new(v3.X, v3.Y)
+	else
+		return nil
 	end
 end
 
@@ -36,7 +38,7 @@ function functions:GetPlayerType(Player)
 	end
 
 	if Player == LocalPlayer then
-		teamType = "self"
+		teamType = "local"
 	end
 	return teamType
 end
@@ -54,7 +56,7 @@ function functions:GetPlayerColor(root, Player, isVisible, part, additional)
 	end
 
 	if Player == LocalPlayer then
-		teamType = "self"
+		teamType = "local"
 	end
 
 	if part == "HealthBar" and additional == "Fill" then
@@ -68,7 +70,8 @@ function functions:GetPlayerColor(root, Player, isVisible, part, additional)
 		else
 			currentStatus = "Low"
 		end
-		return root.Settings.currentColors[teamType].HealthBar.Fills[currentStatus]
+		return root.Settings.currentColors[teamType].HealthBar
+			and root.Settings.currentColors[teamType].HealthBar.Fills[currentStatus]
 	elseif part == "HealthBar" or part == "Text" then
 		return root.Settings.currentColors[teamType][part]
 	end

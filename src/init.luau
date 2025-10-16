@@ -24,7 +24,7 @@ local Twilight = {
 					enemy = false,
 					friendly = false,
 					generic = false,
-					self = false,
+					["local"] = false,
 				},
 			},
 		},
@@ -162,7 +162,7 @@ local Twilight = {
 					Invisible = Color3.new(1, 1, 1),
 				},
 			},
-			["self"] = {
+			["local"] = {
 				Box = {
 					Outline = {
 						Visible = Color3.new(1, 1, 1),
@@ -212,7 +212,7 @@ local Twilight = {
 			Enabled = {
 				enemy = false,
 				friendly = false,
-				self = false,
+				["local"] = false,
 				generic = false,
 			},
 
@@ -248,7 +248,7 @@ local Twilight = {
 			Enabled = {
 				enemy = false,
 				friendly = false,
-				self = false,
+				["local"] = false,
 				generic = false,
 			},
 
@@ -258,7 +258,7 @@ local Twilight = {
 			Enabled = {
 				enemy = false,
 				friendly = false,
-				self = false,
+				["local"] = false,
 				generic = false,
 			},
 			DistanceUnit = 1, -- 1 studs, 2 meters
@@ -268,7 +268,7 @@ local Twilight = {
 			Enabled = {
 				enemy = false,
 				friendly = false,
-				self = false,
+				["local"] = false,
 				generic = false,
 			},
 			Outline = {
@@ -287,7 +287,7 @@ local Twilight = {
 			Enabled = {
 				enemy = false,
 				friendly = false,
-				self = false,
+				["local"] = false,
 				generic = false,
 			},
 			Thickness = 1, --px
@@ -319,49 +319,37 @@ local Twilight = {
 	_connections = {},
 }
 
-local isAlreadyUnloaded = false
-function Twilight:Load()
-	Twilight.Settings.Enabled = true
-	isAlreadyUnloaded = false
+function Twilight:Unload()
+	for _, player in ipairs(Players:GetPlayers()) do
+		playerEsp:RemoveESP(Twilight, player)
+	end
+	Twilight.Drawings.ESP = {}
+	Twilight.Drawings.Skeleton = {}
+	Twilight.Highlights = {}
 end
 
-function Twilight:Unload(destroy)
-	Twilight.Settings.Enabled = false
-	isAlreadyUnloaded = true
-	if destroy then
-		for _, player in ipairs(Players:GetPlayers()) do
-			playerEsp:RemoveESP(Twilight, player)
-		end
-		Twilight.Drawings.ESP = {}
-		Twilight.Drawings.Skeleton = {}
-		Twilight.Highlights = {}
-		for _, connection in pairs(Twilight._connections) do
-			connection:Disconnect()
-			connection = nil
-		end
-	else
-		for _, player in ipairs(Players:GetPlayers()) do
-			local esp = Twilight.Drawings.ESP[player]
-			if esp then
-				for _, obj in pairs(esp.Box) do
-					obj.Visible = false
-				end
-				esp.Tracer.Visible = false
-				for _, obj in pairs(esp.HealthBar) do
-					obj.Visible = false
-				end
-				for _, obj in pairs(esp.Info) do
-					obj.Visible = false
-				end
-				esp.Snapline.Visible = false
+function Twilight:DisablePlayerESP()
+	for _, player in ipairs(Players:GetPlayers()) do
+		local esp = Twilight.Drawings.ESP[player]
+		if esp then
+			for _, obj in pairs(esp.Box) do
+				obj.Visible = false
 			end
+			esp.Tracer.Visible = false
+			for _, obj in pairs(esp.HealthBar) do
+				obj.Visible = false
+			end
+			for _, obj in pairs(esp.Info) do
+				obj.Visible = false
+			end
+			esp.Snapline.Visible = false
+		end
 
-			-- Also hide skeleton
-			local skeleton = Twilight.Drawings.Skeleton[player]
-			if skeleton then
-				for _, line in pairs(skeleton) do
-					line.Visible = false
-				end
+		-- Also hide skeleton
+		local skeleton = Twilight.Drawings.Skeleton[player]
+		if skeleton then
+			for _, line in pairs(skeleton) do
+				line.Visible = false
 			end
 		end
 	end
@@ -374,21 +362,17 @@ table.insert(
 	Twilight._connections,
 	RunService.RenderStepped:Connect(function()
 		if not Twilight.Settings.Enabled then
-			if not isAlreadyUnloaded then
-				Twilight:Unload(false)
-			end
+			Twilight:DisablePlayerESP()
 			return
 		end
 
 		local currentTime = tick()
 		if currentTime - lastUpdate >= Twilight.Settings.RefreshRate then
 			for _, player in ipairs(Players:GetPlayers()) do
-				if player ~= LocalPlayer then
-					if not Twilight.Drawings.ESP[player] then
-						playerEsp:CreateESP(Twilight, player)
-					end
-					playerEsp:UpdateESP(Twilight, player)
+				if not Twilight.Drawings.ESP[player] then
+					playerEsp:CreateESP(Twilight, player)
 				end
+				playerEsp:UpdateESP(Twilight, player)
 			end
 			lastUpdate = currentTime
 		end
@@ -413,7 +397,5 @@ for _, player in ipairs(Players:GetPlayers()) do
 end
 
 function Twilight:EnablePlayerESP() end
-
-function Twilight:DisablePlayerESP() end
 
 return Twilight

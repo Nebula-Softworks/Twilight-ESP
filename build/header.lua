@@ -5,8 +5,9 @@
 	by Nebula Softworks
 
 
-	hunt3r | Designing + Programming
-	cyclic@luau.software | Helping hunt3r with OCD issues
+	hunt3r/Nebula Softworks | Designing + Programming
+	cyclic@luau.software | Helping with Project Setup
+	check the github for more credits.
 	
     
 	Licensed Under CC-BY-NC 4.0 License
