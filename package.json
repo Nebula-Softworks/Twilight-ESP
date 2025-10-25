@@ -1,0 +1,14 @@
+{
+  "name": "twilight-esp",
+  "version": "1.2.0",
+  "description": "The Extrasensory Star",
+  "main": "src/init.luau",
+  "scripts": {
+    "dev-bundle": "lune run build/init.development.lua",
+    "bundle": "lune run build"
+  },
+  "keywords": [],
+  "author": "Nebula Softworks",
+  "license": "CC-BY-NC 4.0",
+  "packageManager": "pnpm@10.15.1"
+}

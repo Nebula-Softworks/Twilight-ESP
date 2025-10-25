@@ -400,14 +400,14 @@ function Twilight:EnablePlayerRadar() end
 function Twilight:DisablePlayerRadar() end
 
 function Twilight:BindESPToObject(object, rootPart)
-	objectEsp.CreateESP(Twilight, object, rootPart)
+	return objectEsp.CreateESP(Twilight, object, rootPart)
 end
 
 local lastUpdate = 0
 table.insert(
 	Twilight._connections,
 	RunService.RenderStepped:Connect(function()
-		function playerupd()
+		local function playerupd()
 			if not Twilight.Settings.Enabled then
 				Twilight:DisablePlayerESP()
 				return
@@ -424,7 +424,7 @@ table.insert(
 				lastUpdate = currentTime
 			end
 		end
-		function objectupd()
+		local function objectupd()
 			if not Twilight.Settings.ObjectsEnabled then
 				Twilight:DisableObjectESP()
 				return
