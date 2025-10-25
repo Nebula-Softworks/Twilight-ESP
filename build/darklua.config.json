@@ -1,4 +1,8 @@
 {
+	"generator" : {
+		"name": "dense",
+		"column_span":  9223372036854775807
+	},
 	"bundle": {
 	  "require_mode": {
 		"name" : "luau",
@@ -14,6 +18,11 @@
 	  "remove_types",
 	  "remove_comments",
 	  "group_local_assignment",
+	  "convert_local_function_to_assign",
+	  "convert_index_to_field",
+	  "filter_after_early_return",
+	  "remove_empty_do",
+	  "remove_function_call_parens",
 	  "remove_spaces",
 	  {
 		"rule": "append_text_comment",

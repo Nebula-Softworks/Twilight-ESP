@@ -15,9 +15,12 @@ local Camera = workspace.CurrentCamera
 local LocalPlayer = Players.LocalPlayer
 
 local playerEsp = {}
+local tracerorigin = utilities.GetTracerOrigin
+local playertype = utilities.GetPlayerType
+local playercolorfunc = utilities.GetPlayerColor
 
 function playerEsp:CreateESP(Library, Player)
-	local teamType = utilities:GetPlayerType(Player)
+	local teamType = playertype(utilities, Player)
 
 	local box = {
 		TopLeft = Drawing.new("Line"),
@@ -40,7 +43,7 @@ function playerEsp:CreateESP(Library, Player)
 	tracer.Visible = false
 	tracer.Color = Library.Settings.currentColors[teamType].Tracer.Visible
 	tracer.Thickness = Library.Settings.Tracer.Thickness
-	tracer.From = utilities:GetTracerOrigin(Library)
+	tracer.From = tracerorigin(utilities, Library)
 
 	local healthBar = {
 		Outline = Drawing.new("Square"),
@@ -78,7 +81,6 @@ function playerEsp:CreateESP(Library, Player)
 			obj.Color = Library.Settings.currentColors[teamType].HealthBar.Fills[healthtype]
 			obj.Font = 2
 		else
-			print(teamType)
 			obj.Filled = false
 		end
 	end
@@ -166,16 +168,16 @@ function playerEsp:RemoveESP(Library, Player)
 	local esp = Library.Drawings.ESP[Player]
 	if esp then
 		for _, obj in pairs(esp.Box) do
-			obj:Remove()
+			obj:Destroy()
 		end
-		esp.Tracer:Remove()
+		esp.Tracer:Destroy()
 		for _, obj in pairs(esp.HealthBar) do
-			obj:Remove()
+			obj:Destroy()
 		end
 		for _, obj in pairs(esp.Info) do
-			obj:Remove()
+			obj:Destroy()
 		end
-		esp.Snapline:Remove()
+		esp.Snapline:Destroy()
 		Library.Drawings.ESP[Player] = nil
 	end
 
@@ -188,7 +190,7 @@ function playerEsp:RemoveESP(Library, Player)
 	local skeleton = Library.Drawings.Skeleton[Player]
 	if skeleton then
 		for _, line in pairs(skeleton) do
-			line:Remove()
+			line:Destroy()
 		end
 		Library.Drawings.Skeleton[Player] = nil
 	end
@@ -351,7 +353,7 @@ function playerEsp:UpdateESP(Library, player)
 		return
 	end
 
-	local teamType = utilities:GetPlayerType(player)
+	local teamType = playertype(utilities, player)
 
 	if Library.Settings.Checks.Team.Enabled then
 		if not Library.Settings.Checks.Team.SelectedTeams[teamType] then
@@ -370,15 +372,15 @@ function playerEsp:UpdateESP(Library, player)
 		end
 	end
 
-	local boxColor = utilities:GetPlayerColor(Library, player, isVisible, "Box", "Outline")
-	local boxFillColor = utilities:GetPlayerColor(Library, player, isVisible, "Box", "Fill")
-	local tracerColor = utilities:GetPlayerColor(Library, player, isVisible, "Tracer")
-	local textColor = utilities:GetPlayerColor(Library, player, isVisible, "Text")
-	local skeletonColor = utilities:GetPlayerColor(Library, player, isVisible, "Skeleton")
-	local chamsOutlineColor = utilities:GetPlayerColor(Library, player, isVisible, "Chams", "Outline")
-	local chamsFillColor = utilities:GetPlayerColor(Library, player, isVisible, "Chams", "Fill")
-	local currentHealthColor = utilities:GetPlayerColor(Library, player, isVisible, "HealthBar", "Fill")
-	local healthOutlineColor = utilities:GetPlayerColor(Library, player, isVisible, "HealthBar", "Outline")
+	local boxColor = playercolorfunc(utilities, Library, player, isVisible, "Box", "Outline")
+	local boxFillColor = playercolorfunc(utilities, Library, player, isVisible, "Box", "Fill")
+	local tracerColor = playercolorfunc(utilities, Library, player, isVisible, "Tracer")
+	local textColor = playercolorfunc(utilities, Library, player, isVisible, "Text")
+	local skeletonColor = playercolorfunc(utilities, Library, player, isVisible, "Skeleton")
+	local chamsOutlineColor = playercolorfunc(utilities, Library, player, isVisible, "Chams", "Outline")
+	local chamsFillColor = playercolorfunc(utilities, Library, player, isVisible, "Chams", "Fill")
+	local currentHealthColor = playercolorfunc(utilities, Library, player, isVisible, "HealthBar", "Fill")
+	local healthOutlineColor = playercolorfunc(utilities, Library, player, isVisible, "HealthBar", "Outline")
 	local size = character:GetExtentsSize()
 	local cf = rootPart.CFrame
 
@@ -491,15 +493,16 @@ function playerEsp:UpdateESP(Library, player)
 			end
 			local function drawConnectingBox(pointa, pointb, pointc, pointd)
 				local quad = Drawing.new("Quad")
+				quad.Thickness = 5
+				quad.Filled = true
+				quad.Transparency = Library.Settings.Box.Filled.Transparency
+				quad.Color = boxFillColor
+				quad.PointA = pointa
+				quad.PointB = pointb
+				quad.PointD = pointc
+				quad.PointC = pointd
 				if Library.Settings.Box.Filled.Enabled then
 					quad.Visible = true
-					quad.Filled = true
-					quad.Transparency = Library.Settings.Box.Filled.Transparency
-					quad.Color = boxFillColor
-					quad.PointA = pointa
-					quad.PointB = pointb
-					quad.PointD = pointc
-					quad.PointC = pointd
 				else
 					quad.Visible = false
 				end
@@ -524,21 +527,22 @@ function playerEsp:UpdateESP(Library, player)
 			task.defer(function()
 				task.wait(Library.Settings.Framerate or 1 / 144)
 				for _, drawing in ipairs(connectors) do
-					drawing:Remove()
+					drawing:Destroy()
 				end
 			end)
 		else
 			local function drawConnectingBox(pointa, pointb, pointc, pointd)
 				local quad = Drawing.new("Quad")
+				quad.Thickness = 5
+				quad.Filled = true
+				quad.Transparency = Library.Settings.Box.Filled.Transparency
+				quad.Color = boxFillColor
+				quad.PointA = pointa
+				quad.PointB = pointb
+				quad.PointD = pointc
+				quad.PointC = pointd
 				if Library.Settings.Box.Filled.Enabled then
 					quad.Visible = true
-					quad.Filled = true
-					quad.Transparency = Library.Settings.Box.Filled.Transparency
-					quad.Color = boxFillColor
-					quad.PointA = pointa
-					quad.PointB = pointb
-					quad.PointD = pointc
-					quad.PointC = pointd
 				else
 					quad.Visible = false
 				end
@@ -609,10 +613,10 @@ function playerEsp:UpdateESP(Library, player)
 				esp.Box.BottomLeft.Visible = false
 				esp.Box.BottomRight.Visible = false
 			end
-			task.spawn(function()
+			task.defer(function()
 				task.wait()
 				for _, drawing in ipairs(connectors) do
-					drawing:Remove()
+					drawing:Destroy()
 				end
 			end)
 		end
@@ -626,7 +630,7 @@ function playerEsp:UpdateESP(Library, player)
 	end
 
 	if Library.Settings.Tracer.Enabled[teamType] then
-		esp.Tracer.From = utilities:GetTracerOrigin(Library)
+		esp.Tracer.From = tracerorigin(utilities, Library)
 		esp.Tracer.To = Vector2.new(pos.X, pos.Y)
 		esp.Tracer.Color = tracerColor
 		esp.Tracer.Visible = true

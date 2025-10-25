@@ -72,8 +72,12 @@ function functions:GetPlayerColor(root, Player, isVisible, part, additional)
 		end
 		return root.Settings.currentColors[teamType].HealthBar
 			and root.Settings.currentColors[teamType].HealthBar.Fills[currentStatus]
-	elseif part == "HealthBar" or part == "Text" then
+	elseif part == "Text" then
 		return root.Settings.currentColors[teamType][part]
+	elseif part == "HealthBar" and additional == "Outline" then
+		return root.Settings.currentColors[teamType].HealthBar
+				and root.Settings.currentColors[teamType].HealthBar["Outline"]
+			or Color3.new(0, 0, 0)
 	end
 
 	if root.Settings.Checks.Visible.Enabled and not isVisible then
