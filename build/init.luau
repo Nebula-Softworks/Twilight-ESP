@@ -3,7 +3,7 @@ local process = require("@lune/process")
 
 local FilePath = "dist/main.luau"
 local TempFile = "dist/temp.luau"
-local Header = fs.readFile("./build/header.lua")
+local Header = fs.readFile("./build/header.luau")
 
 local function bundle()
 	process.exec("darklua", { "process", "src/init.luau", TempFile, "--config", "./build/darklua.config.json" })

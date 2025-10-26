@@ -22,10 +22,6 @@
 	  "filter_after_early_return",
 	  "remove_empty_do",
 	  "remove_function_call_parens",
-	  "remove_spaces",
-	  {
-		"rule": "append_text_comment",
-		"file": "./header.lua"
-	  }
+	  "remove_spaces"
 	]
   }

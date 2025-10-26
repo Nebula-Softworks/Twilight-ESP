@@ -168,29 +168,35 @@ function playerEsp:RemoveESP(Library, Player)
 	local esp = Library.Drawings.ESP[Player]
 	if esp then
 		for _, obj in pairs(esp.Box) do
-			obj:Destroy()
+			pcall(obj.Remove, obj)
+			pcall(obj.Destroy, obj)
 		end
-		esp.Tracer:Destroy()
+		pcall(esp.Tracer.Remove, esp.Tracer)
+		pcall(esp.Tracer.Destroy, esp.Tracer)
 		for _, obj in pairs(esp.HealthBar) do
-			obj:Destroy()
+			pcall(obj.Remove, obj)
+			pcall(obj.Destroy, obj)
 		end
 		for _, obj in pairs(esp.Info) do
-			obj:Destroy()
+			pcall(obj.Remove, obj)
+			pcall(obj.Destroy, obj)
 		end
-		esp.Snapline:Destroy()
+		pcall(esp.Snapline.Remove, esp.Snapline)
+		pcall(esp.Snapline.Destroy, esp.Snapline)
 		Library.Drawings.ESP[Player] = nil
 	end
 
 	local highlight = Library.Highlights[Player]
 	if highlight then
-		highlight:Destroy()
+		pcall(highlight.Destroy, highlight)
 		Library.Highlights[Player] = nil
 	end
 
 	local skeleton = Library.Drawings.Skeleton[Player]
 	if skeleton then
 		for _, line in pairs(skeleton) do
-			line:Destroy()
+			pcall(line.Remove, line)
+			pcall(line.Destroy, line)
 		end
 		Library.Drawings.Skeleton[Player] = nil
 	end
@@ -350,6 +356,13 @@ function playerEsp:UpdateESP(Library, player)
 			obj.Visible = false
 		end
 		esp.Snapline.Visible = false
+
+		local skeleton = Library.Drawings.Skeleton[player]
+		if skeleton then
+			for _, line in pairs(skeleton) do
+				line.Visible = false
+			end
+		end
 		return
 	end
 
@@ -368,6 +381,13 @@ function playerEsp:UpdateESP(Library, player)
 				obj.Visible = false
 			end
 			esp.Snapline.Visible = false
+
+			local skeleton = Library.Drawings.Skeleton[player]
+			if skeleton then
+				for _, line in pairs(skeleton) do
+					line.Visible = false
+				end
+			end
 			return
 		end
 	end
@@ -491,16 +511,28 @@ function playerEsp:UpdateESP(Library, player)
 				line.To = to
 				return line
 			end
-			local function drawConnectingBox(pointa, pointb, pointc, pointd)
-				local quad = Drawing.new("Quad")
-				quad.Thickness = 5
-				quad.Filled = true
+			local function drawConnectingBox(a, b, c, d)
+				-- returns fromVec2, toVec2, thicknessNumber (pixels)
+				local function faceCenterLine_and_thickness(a, b, c, d)
+					local law = math.abs((b - a).X)
+					local lah = math.abs((b - a).Y)
+					local length = math.sqrt(law * law + lah * lah)
+					local law2 = math.abs((d - c).X)
+					local lah2 = math.abs((d - c).Y)
+					local length2 = math.sqrt(law2 * law2 + lah2 * lah2)
+					print(length == length2 and "YESSS MATH WORKS" or "fuck ts")
+
+					return (d - a) / 2 + a, (c - b) / 2 + b, length
+				end
+
+				local from, to, thickness = faceCenterLine_and_thickness(a, b, c, d)
+				local quad = Drawing.new("Line")
 				quad.Transparency = Library.Settings.Box.Filled.Transparency
 				quad.Color = boxFillColor
-				quad.PointA = pointa
-				quad.PointB = pointb
-				quad.PointD = pointc
-				quad.PointC = pointd
+				quad.Thickness = thickness
+				quad.From = from
+				quad.To = to
+
 				if Library.Settings.Box.Filled.Enabled then
 					quad.Visible = true
 				else
@@ -519,28 +551,26 @@ function playerEsp:UpdateESP(Library, player)
 				drawConnectingBox(back.TL, back.TR, back.BL, back.BR),
 				drawConnectingBox(front.TL, back.TL, front.BL, back.BL),
 				drawConnectingBox(front.TR, back.TR, front.BR, back.BR),
-				drawConnectingBox(front.TR, back.TR, front.TL, back.TR),
-				drawConnectingBox(front.BR, back.BR, front.BL, back.BR),
+				drawConnectingBox(front.TR, back.TR, back.TR, front.TL),
+				drawConnectingBox(front.BR, back.BR, back.BR, front.BL),
 			}
 
 			-- Clean up connecting lines and filled after frame
 			task.defer(function()
 				task.wait(Library.Settings.Framerate or 1 / 144)
 				for _, drawing in ipairs(connectors) do
-					drawing:Destroy()
+					pcall(drawing.Remove, drawing)
+					pcall(drawing.Destroy, drawing)
 				end
 			end)
 		else
-			local function drawConnectingBox(pointa, pointb, pointc, pointd)
-				local quad = Drawing.new("Quad")
-				quad.Thickness = 5
+			local function drawConnectingBox(pointa, pointd)
+				local quad = Drawing.new("Square")
 				quad.Filled = true
 				quad.Transparency = Library.Settings.Box.Filled.Transparency
 				quad.Color = boxFillColor
-				quad.PointA = pointa
-				quad.PointB = pointb
-				quad.PointD = pointc
-				quad.PointC = pointd
+				quad.Position = pointa
+				quad.Size = pointd - pointa
 				if Library.Settings.Box.Filled.Enabled then
 					quad.Visible = true
 				else
@@ -550,12 +580,7 @@ function playerEsp:UpdateESP(Library, player)
 			end
 
 			local connectors = {
-				drawConnectingBox(
-					boxPosition,
-					boxPosition + Vector2.new(boxSize.X, 0),
-					boxPosition + Vector2.new(0, boxSize.Y),
-					boxPosition + Vector2.new(boxSize.X, boxSize.Y)
-				),
+				drawConnectingBox(boxPosition, boxPosition + Vector2.new(boxSize.X, boxSize.Y)),
 			}
 			if Library.Settings.Box.Style == 1 then
 				local cornerSize = boxWidth * 0.2
@@ -616,7 +641,8 @@ function playerEsp:UpdateESP(Library, player)
 			task.defer(function()
 				task.wait()
 				for _, drawing in ipairs(connectors) do
-					drawing:Destroy()
+					pcall(drawing.Remove, drawing)
+					pcall(drawing.Destroy, drawing)
 				end
 			end)
 		end

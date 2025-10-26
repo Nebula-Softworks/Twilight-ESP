@@ -60,6 +60,9 @@ function functions:GetPlayerColor(root, Player, isVisible, part, additional)
 	end
 
 	if part == "HealthBar" and additional == "Fill" then
+		if not Player.Character then
+			return
+		end
 		local maxHealth = Player.Character.Humanoid.MaxHealth
 		local currentHealth = Player.Character.Humanoid.Health
 		local currentStatus
@@ -75,6 +78,9 @@ function functions:GetPlayerColor(root, Player, isVisible, part, additional)
 	elseif part == "Text" then
 		return root.Settings.currentColors[teamType][part]
 	elseif part == "HealthBar" and additional == "Outline" then
+		if not Player.Character then
+			return
+		end
 		return root.Settings.currentColors[teamType].HealthBar
 				and root.Settings.currentColors[teamType].HealthBar["Outline"]
 			or Color3.new(0, 0, 0)

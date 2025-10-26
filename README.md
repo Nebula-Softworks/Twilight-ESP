@@ -1,4 +1,4 @@
-# Twilight ESP Library
+# Twilight ESP Suite
 ![Image](https://github.com/Nebula-Softworks/Twilight-ESP/blob/master/assets/Twilight%20Cover%20Image.png?raw=true)
 
 ***
@@ -16,18 +16,32 @@ So Start using Twilight, the extrasensory star, today.
 | ![preview](https://docs.nebulasoftworks.xyz/img/twilight/Twilight.png) | ![preview2](https://docs.nebulasoftworks.xyz/img/twilight/config.png) |
   
 ## Structure Of Twilight
-A semi-rojo project made via modular luau scripts, compiled for usage by darklua. Semi-rojo as it is used for Luau LSP and Selene Linter, but doesn't actually sync to Roblox.  
+A semi-Rojo project made via modular Luau scripts, compiled for usage by Darklua and Lune. Semi-Rojo as it is used for Luau LSP and Selene Linter, but doesn't actually sync to Roblox.  
 As of Version 1.2, Twilight does not support usage outside of executors supporting the Drawing sUNC function.  
-Prior to Version 1.2, Twilight was compiled for usage with maui by Latte Softworks.  
+Prior to Version 1.2, Twilight was compiled for usage with Maui by Latte Softworks.  
   
 ## [Documentation](https://docs.nebulasoftworks.xyz/twilight)  
-For Releases before Version 1.2, check the 1.1a release's assets.  
+> For Releases before Version 1.2, check the 1.1a release's assets.  
+  
+## How To Compile Your Changes?
+> [!note]
+> You Will Need Performant Node Package Manager (pnpm) and Python
 
+First, clone the repo `git clone https://github.com/Nebula-Softworks/Twilight-ESP.git` if you have not already.  
+Open the repo in your VSC Workspace OR Open the repo in Powershell/Command Prompt.  
+Now, run `pnpm bundle`. Your changes will be bundled into the result.  
+View the `build` folder to see and edit how the code is generated, including the header paragraph etc.  
+  
+### Using the dev-server method
+After completing the first 2 steps, run `pnpm dev-server`. Whenever you save changes, the dist/main.luau file will automatically update.  
+In addition, the code will be generated with much more readable content, allowing for easier debugging.  
+Replace your URL for HttpGet with `http://localhost:8642/dist/main.luau` - if you have changed the port, change it here as well.  
+  
 ## Credits
 Nebula Softworks - Design And Programming  
 cyclic@luau.software - Helping With Some Project Setup  
 Rojo - Project Things (idk man)  
-seaofvoices - Compiler  
+seaofvoices & Lune - Compiler  
 JohnyMorganz - Language Server  
 Latte Softworks - Compiler prior to Version 1.2
 

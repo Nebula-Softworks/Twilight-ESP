@@ -1,7 +1,7 @@
 local services = require("@root/utilities/services")
 local playerEsp = require("@root/components/playerEsp")
 local radarEsp = require("@root/components/radarEsp")
-local objectEsp = require("@root/components/radarEsp")
+local objectEsp = require("@root/components/objectEsp")
 
 local Players = services.Players
 local RunService = services.RunService
@@ -341,6 +341,10 @@ function Twilight:Unload()
 	Twilight.ObjectESPs = {}
 	Twilight.Drawings = {}
 	Twilight.Highlights = {}
+	for _, connection in pairs(Twilight._connections) do
+		connection:Disconnect()
+		connection = nil
+	end
 end
 
 function Twilight:DisablePlayerESP()
@@ -369,11 +373,19 @@ function Twilight:DisablePlayerESP()
 		end
 
 		local Highlight: Highlight = Twilight.Highlights[player]
-		Highlight.Enabled = false
+		if Highlight then
+			Highlight.Enabled = false
+		end
 	end
 end
 
 function Twilight:DisableObjectESP()
+	if not Twilight.ObjectESPs then
+		return
+	end
+	if not Twilight.ObjectESPs.ESPs then
+		return
+	end
 	for _, esp in pairs(Twilight.ObjectESPs.ESPs) do
 		if esp then
 			for _, obj in pairs(esp.Box) do
@@ -403,52 +415,46 @@ function Twilight:BindESPToObject(object, rootPart)
 	return objectEsp.CreateESP(Twilight, object, rootPart)
 end
 
-local lastUpdate = 0
+local lastUpdate, lastUpdate1 = 0, 0
 table.insert(
 	Twilight._connections,
 	RunService.RenderStepped:Connect(function()
-		local function playerupd()
-			if not Twilight.Settings.Enabled then
-				Twilight:DisablePlayerESP()
-				return
-			end
-
-			local currentTime = tick()
-			if currentTime - lastUpdate >= Twilight.Settings.RefreshRate then
-				for _, player in ipairs(Players:GetPlayers()) do
-					if not Twilight.Drawings.ESP[player] then
-						playerEsp:CreateESP(Twilight, player)
-					end
-					playerEsp:UpdateESP(Twilight, player)
-				end
-				lastUpdate = currentTime
-			end
+		if not Twilight.Settings.Enabled then
+			Twilight:DisablePlayerESP()
+			return
 		end
-		local function objectupd()
-			if not Twilight.Settings.ObjectsEnabled then
-				Twilight:DisableObjectESP()
-				return
-			end
-
-			local currentTime = tick()
-			if currentTime - lastUpdate >= Twilight.Settings.RefreshRate then
-				for _, player in ipairs(Players:GetPlayers()) do
-					if not Twilight.Drawings.ESP[player] then
-						playerEsp:CreateESP(Twilight, player)
-					end
-					playerEsp:UpdateESP(Twilight, player)
+		local currentTime = tick()
+		if currentTime - lastUpdate >= Twilight.Settings.RefreshRate then
+			for _, player in ipairs(Players:GetPlayers()) do
+				if not Twilight.Drawings.ESP[player] then
+					playerEsp:CreateESP(Twilight, player)
 				end
-				for _, esp in pairs(Twilight.ObjectESPs.ESPs) do
-					if esp then
-						esp:UpdateESP(Twilight)
-					end
-				end
-				lastUpdate = currentTime
+				playerEsp:UpdateESP(Twilight, player)
 			end
+			lastUpdate = currentTime
+		end
+	end)
+)
+table.insert(
+	Twilight._connections,
+	RunService.RenderStepped:Connect(function()
+		if not Twilight.Settings.ObjectsEnabled then
+			Twilight:DisableObjectESP()
+			return
 		end
 
-		playerupd()
-		objectupd()
+		local currentTime = tick()
+		if currentTime - lastUpdate1 >= Twilight.Settings.RefreshRate then
+			if not Twilight.ObjectESPs then
+				return
+			end
+			for _, esp in pairs(Twilight.ObjectESPs.ESPs) do
+				if esp then
+					esp:UpdateESP(Twilight)
+				end
+			end
+			lastUpdate1 = currentTime
+		end
 	end)
 )
 

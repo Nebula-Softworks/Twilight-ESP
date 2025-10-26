@@ -7,5 +7,4 @@
 
 #auto-generated files
 sourcemap.json
-
-dist/
+node_modules/
