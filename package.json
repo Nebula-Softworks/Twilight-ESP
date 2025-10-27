@@ -11,6 +11,8 @@
   },
   "keywords": [],
   "author": "Nebula Softworks",
+  "repository": "https://github.com/Nebula-Softworks/Twilight-ESP",
+  "discord": "https://dsc.gg/nebulasoftworks",
   "license": "CC-BY-NC 4.0",
   "packageManager": "pnpm@10.15.1",
   "devDependencies": {

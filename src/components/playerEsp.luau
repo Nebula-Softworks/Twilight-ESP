@@ -512,20 +512,58 @@ function playerEsp:UpdateESP(Library, player)
 				return line
 			end
 			local function drawConnectingBox(a, b, c, d)
-				-- returns fromVec2, toVec2, thicknessNumber (pixels)
-				local function faceCenterLine_and_thickness(a, b, c, d)
-					local law = math.abs((b - a).X)
-					local lah = math.abs((b - a).Y)
-					local length = math.sqrt(law * law + lah * lah)
-					local law2 = math.abs((d - c).X)
-					local lah2 = math.abs((d - c).Y)
-					local length2 = math.sqrt(law2 * law2 + lah2 * lah2)
-					print(length == length2 and "YESSS MATH WORKS" or "fuck ts")
-
-					return (d - a) / 2 + a, (c - b) / 2 + b, length
+				local function dot(u, v)
+					return u.X * v.X + u.Y * v.Y
 				end
 
-				local from, to, thickness = faceCenterLine_and_thickness(a, b, c, d)
+				local function length(v)
+					return math.sqrt(v.X * v.X + v.Y * v.Y)
+				end
+
+				local function normalize(v)
+					local l = length(v)
+					if l == 0 then
+						return Vector2.new(0, 0)
+					end
+					return Vector2.new(v.X / l, v.Y / l)
+				end
+
+				-- a: top-left, b: top-right, c: bottom-right, d: bottom-left (all Vector2 screen coords)
+				-- returns: from(Vector2), to(Vector2), thickness(number)
+				local function faceCenterLine_and_thickness()
+					-- width vector (top edge)
+					local widthVec = c - a
+					local wlen = length(widthVec)
+					if wlen == 0 then
+						-- degenerate top edge: fallback to small visible line between a and c
+						local fallbackFrom = (a + d) * 0.5
+						local fallbackTo = (b + c) * 0.5
+						return fallbackFrom, fallbackTo, 1
+					end
+
+					-- perpendicular normal to width, rotated 90 degrees (counter-clockwise)
+					local n = Vector2.new(-widthVec.Y, widthVec.X)
+					local nUnit = normalize(n)
+					if nUnit.X == 0 and nUnit.Y == 0 then
+						-- shouldn't happen because when > 0, but safe guard
+						return (a + d) * 0.5, (b + c) * 0.5, 1
+					end
+
+					-- perpendicular distances from top edge to bottom points projected onto normal
+					local distLeft = math.abs(dot(d - a, nUnit))
+					local distRight = math.abs(dot(b - c, nUnit))
+
+					-- average for stability (handles small skew/trapezoids)
+					local height = (distLeft + distRight) * 0.5
+
+					-- midpoints of left and right edges
+					local leftMid = (a + b) * 0.5
+					local rightMid = (d + c) * 0.5
+
+					return leftMid, rightMid, height
+				end
+
+				local from, to, thickness = faceCenterLine_and_thickness()
 				local quad = Drawing.new("Line")
 				quad.Transparency = Library.Settings.Box.Filled.Transparency
 				quad.Color = boxFillColor
@@ -551,13 +589,13 @@ function playerEsp:UpdateESP(Library, player)
 				drawConnectingBox(back.TL, back.TR, back.BL, back.BR),
 				drawConnectingBox(front.TL, back.TL, front.BL, back.BL),
 				drawConnectingBox(front.TR, back.TR, front.BR, back.BR),
-				drawConnectingBox(front.TR, back.TR, back.TR, front.TL),
-				drawConnectingBox(front.BR, back.BR, back.BR, front.BL),
+				drawConnectingBox(back.TL, back.TR, front.TR, front.TL),
+				drawConnectingBox(back.BL, back.BR, front.BR, front.BL),
 			}
 
 			-- Clean up connecting lines and filled after frame
 			task.defer(function()
-				task.wait(Library.Settings.Framerate or 1 / 144)
+				task.wait(Library.Settings.Framerate or 1 / 60)
 				for _, drawing in ipairs(connectors) do
 					pcall(drawing.Remove, drawing)
 					pcall(drawing.Destroy, drawing)
