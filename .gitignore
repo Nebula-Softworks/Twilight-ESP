@@ -1,5 +1,6 @@
 # Project place file
 /Twilight ESP.rbxlx
+dist
 
 # Roblox Studio lock files
 /*.rbxlx.lock
@@ -7,3 +8,6 @@
 
 #auto-generated files
 sourcemap.json
+
+# editor generated stuff
+.vscode
