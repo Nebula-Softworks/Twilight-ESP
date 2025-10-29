@@ -6,8 +6,8 @@
   "scripts": {
     "dev-bundle": "lune run build/init.development.lua",
     "dev-server": "concurrently \"python -m http.server 8642\" \"chokidar \\\"src/**/*.luau\\\" -c \\\"pnpm dev-bundle\\\"\"",
-
-    "bundle": "lune run build"
+    "buildmodel": "mkdirp dist && rojo build build.project.json -o dist/Twilight.ESP.rbxm",
+    "bundle": "lune run build && pnpm buildmodel"
   },
   "keywords": [],
   "author": "Nebula Softworks",
@@ -17,6 +17,7 @@
   "packageManager": "pnpm@10.15.1",
   "devDependencies": {
     "chokidar-cli": "^3.0.0",
-    "concurrently": "^9.2.1"
+    "concurrently": "^9.2.1",
+    "mkdirp": "^3.0.1"
   }
 }

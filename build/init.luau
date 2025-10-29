@@ -1,7 +1,7 @@
 local fs = require("@lune/fs")
 local process = require("@lune/process")
 
-local FilePath = "dist/main.luau"
+local FilePath = "dist/Twilight.ESP.luau"
 local TempFile = "dist/temp.luau"
 local Header = fs.readFile("./build/header.luau")
 

@@ -1,0 +1,6 @@
+{
+    "name": "Twilight ESP",
+    "tree": {
+        "$path" : "src"
+    }
+  }
