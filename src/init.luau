@@ -210,6 +210,10 @@ local Twilight = {
 					Invisible = Color3.new(1, 1, 1),
 				},
 			},
+			radar = {
+				Background = Color3.fromRGB(5, 5, 5),
+				Border = Color3.fromRGB(35, 35, 35),
+			},
 		},
 
 		HealthBar = {
@@ -299,6 +303,12 @@ local Twilight = {
 			ExplicitBodyType = nil, -- 1 R15, 2 R6. But not required as the esp will auto detect body types
 		},
 
+		Radar = {
+			Enabled = true,
+			Size = 100, -- Radius Of The Circle, Hence The Circle will be 200x200
+			Scale = 1, -- Determinatant Factor on the effect of the relative pos for 2D replacement
+		},
+
 		TextSize = 14,
 		MaxDistance = 2000, -- studs
 		RefreshRate = 1 / 120,
@@ -314,14 +324,15 @@ local Twilight = {
 		Names = {},
 		Distances = {},
 		Snaplines = {},
-		Skeleton = {},
-
-		ObjectESPs = {
-			Highlights = {},
-			ESPs = {},
-		},
 		Radar = {},
+		Skeleton = {},
 	},
+
+	ObjectESPs = {
+		Highlights = {},
+		ESPs = {},
+	},
+
 	Highlights = {},
 
 	_connections = {},
@@ -408,10 +419,11 @@ function Twilight:DisableObjectESP()
 	end
 end
 
-function Twilight:EnablePlayerRadar() end
-function Twilight:DisablePlayerRadar() end
-
 function Twilight:BindESPToObject(object, rootPart)
+	task.defer(function()
+		task.wait(1)
+		radarEsp:updateobjectlist(Twilight)
+	end)
 	return objectEsp.CreateESP(Twilight, object, rootPart)
 end
 
@@ -474,5 +486,6 @@ table.insert(
 for _, player in ipairs(Players:GetPlayers()) do
 	playerEsp:CreateESP(Twilight, player)
 end
+radarEsp:init(Twilight)
 
 return Twilight

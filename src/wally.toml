@@ -1,0 +1,14 @@
+return {
+	dependencies = {
+	},
+	package = {
+		authors = {"Nebula Softworks <support@nebulasoftworks.xyz>", "(mainly by hunt3r <lyzethan@gmail.com>)"},
+		description = "(NOT FINISHED, THIS IS A TEST TO SEE THE FORMATTING OF A PUBLISH. DO NOT INSTALL YET.) Twilight, The Extrasensory Star.",
+		license = "CC-BY-NC 4.0",
+		name = "nebula-softworks/twilight-esp",
+		realm = "shared",
+		registry = "https://github.com/UpliftGames/wally-index",
+		repository = "https://github.com/Nebula-Softworks/Twilight-ESP",
+		version = "1.2.0",
+	},
+}
