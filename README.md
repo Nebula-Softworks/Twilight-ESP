@@ -44,7 +44,7 @@ Replace your URL for HttpGet with `http://localhost:8642/dist/main.luau` - if yo
 ## Credits
 Nebula Softworks - Design And Programming  
 cyclic@luau.software - Helping With Some Project Setup  
-Rojo - Project Things (idk man)  
+Rojo - RBXM Model Builder, Luau LSP System, Development Helper.  
 seaofvoices & Lune - Compiler  
 JohnyMorganz - Language Server Used In Development  
 Latte Softworks - Compiler prior to Version 1.2

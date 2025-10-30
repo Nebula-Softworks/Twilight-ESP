@@ -6,6 +6,9 @@
     "ReplicatedStorage": {
       "Twilight ESP": {
         "$path" : "src"
+      },
+      "TwilightBundled": {
+        "$path" : "dist/Twilight.ESP.luau"
       }
     },
     

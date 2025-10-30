@@ -11,3 +11,4 @@ sourcemap.json
 
 # editor generated stuff
 .vscode
+pnpm-lock.yaml

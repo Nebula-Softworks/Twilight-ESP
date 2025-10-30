@@ -6,8 +6,9 @@
   "scripts": {
     "dev-bundle": "lune run build/init.development.lua",
     "dev-server": "concurrently \"python -m http.server 8642\" \"chokidar \\\"src/**/*.luau\\\" -c \\\"pnpm dev-bundle\\\"\"",
+
     "buildmodel": "mkdirp dist && rojo build build.project.json -o dist/Twilight.ESP.rbxm",
-    "bundle": "lune run build && pnpm buildmodel"
+    "bundle": "pnpm buildmodel && lune run build && del dist\\main.luau 2>nul"
   },
   "keywords": [],
   "author": "Nebula Softworks",
