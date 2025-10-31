@@ -1,6 +1,5 @@
 # Project place file
 /Twilight ESP.rbxlx
-dist
 
 # Roblox Studio lock files
 /*.rbxlx.lock
@@ -8,9 +7,12 @@ dist
 
 #auto-generated files
 sourcemap.json
+pnpm-lock.yaml
+src/wally.lock
 
 # editor generated stuff
 .vscode
-pnpm-lock.yaml
-src/wally.lock
+
+# project generated folders
 node_modules
+dist
