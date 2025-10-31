@@ -13,3 +13,4 @@ sourcemap.json
 .vscode
 pnpm-lock.yaml
 src/wally.lock
+node_modules

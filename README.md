@@ -32,6 +32,7 @@ Prior to Version 1.2, Twilight was compiled for usage with Maui by Latte Softwor
 
 First, clone the repo `git clone https://github.com/Nebula-Softworks/Twilight-ESP.git` if you have not already.  
 Open the repo in your VSC Workspace OR Open the repo in Powershell/Command Prompt.  
+Install the node_modules by running `pnpm install`.  
 Now, run `pnpm bundle`. Your changes will be bundled into the result at dist/Twilight.ESP.luau and dist/Twilight.ESP.rbxm.  
 View the `build` folder to see and edit how the code is generated, including the header paragraph etc.  
   
