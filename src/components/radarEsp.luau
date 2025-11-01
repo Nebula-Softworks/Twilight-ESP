@@ -121,6 +121,11 @@ task.defer(function()
 					end
 
 					PlayerDot.Color = playercolorfunc(utilities, RadarESP.Library, plr, isVisible, "Box", "Outline")
+
+					PlayerDot.Visible = true
+					if not RadarESP.Library.Settings.Radar.Enabled then
+						PlayerDot.Visible = false
+					end
 				else
 					PlayerDot.Visible = false
 					if Players:FindFirstChild(plr.Name) == nil then
@@ -142,7 +147,7 @@ task.defer(function()
 	end
 
 	local function NewLocalDot()
-		local d = Drawing.new("Triangle")
+		local d = drawingfunc("Triangle")
 		d.Visible = true
 		d.Thickness = 1
 		d.Filled = true
@@ -150,6 +155,14 @@ task.defer(function()
 		d.PointA = RadarESP.Library.Settings.Radar.Position + Vector2.new(0, -6)
 		d.PointB = RadarESP.Library.Settings.Radar.Position + Vector2.new(-3, 6)
 		d.PointC = RadarESP.Library.Settings.Radar.Position + Vector2.new(3, 6)
+		coroutine.wrap(function()
+			RunService.RenderStepped:Connect(function()
+				d.Visible = true
+				if not RadarESP.Library.Settings.Radar.Enabled then
+					d.Visible = false
+				end
+			end)
+		end)()
 		return d
 	end
 
@@ -201,6 +214,11 @@ task.defer(function()
 					end
 
 					ObjectDot.Color = playercolorfunc(utilities, RadarESP.Library, helper, isVisible, "Box", "Outline")
+
+					ObjectDot.Visible = true
+					if not RadarESP.Library.Settings.Radar.Enabled then
+						ObjectDot.Visible = false
+					end
 				else
 					ObjectDot.Visible = false
 					pcall(ObjectDot.Destroy, ObjectDot)
@@ -233,6 +251,13 @@ task.defer(function()
 			RadarBorder.Position = RadarESP.Library.Settings.Radar.Position
 			RadarBorder.Radius = RadarESP.Library.Settings.Radar.Radius
 			RadarBorder.Color = RadarESP.Library.Settings.currentColors.Radar.Border
+
+			RadarBorder.Visible = true
+			RadarBackground.Visible = true
+			if not RadarESP.Library.Settings.Radar.Enabled then
+				RadarBorder.Visible = false
+				RadarBackground.Visible = false
+			end
 		end)
 	end)()
 end)
