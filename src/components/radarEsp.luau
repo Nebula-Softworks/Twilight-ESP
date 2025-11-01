@@ -4,16 +4,14 @@ RadarESP.EspObjects = {}
 RadarESP.ExistingESPs = {}
 local services = require("@root/utilities/services")
 local utilities = require("@root/utilities")
+local drawer = require("@root/utilities/drawer")
 
 local Players = services.Players
 local RunService = services.RunService
-local UserInputService = services.UserInputService
 local Camera = workspace.CurrentCamera
 local LocalPlayer = Players.LocalPlayer
 
-local tracerorigin = utilities.GetTracerOrigin
 local playercolorfunc = utilities.GetPlayerColor
-local drawingfunc = Drawing.new
 
 function RadarESP:init(Library)
 	RadarESP:updateobjectlist(Library)
@@ -36,16 +34,16 @@ task.defer(function()
 
 	-- I am creating a function this way as I wont have to set the properties every time
 	local function DrawCircle(Transparency, Color, Radius, Filled, Thickness)
-		local Circle = drawingfunc("Circle")
-		Circle.Transparency = Transparency
-		Circle.Color = Color
-		Circle.Visible = false
-		Circle.Thickness = Thickness
-		Circle.Position = Vector2.new(0, 0)
-		Circle.Radius = Radius
-		Circle.NumSides = math.clamp(Radius * 55 / 100, 10, 75)
-		Circle.Filled = Filled
-		return Circle
+		return drawer.new("Circle", {
+			Transparency = Transparency,
+			Color = Color,
+			Visible = false,
+			Thickness = Thickness,
+			Position = Vector2.new(0, 0),
+			Radius = Radius,
+			NumSides = math.clamp(Radius * 55 / 100, 10, 75),
+			Filled = Filled,
+		})
 	end
 
 	local RadarBackground = DrawCircle(
@@ -84,7 +82,6 @@ task.defer(function()
 	local function PlaceDot(plr)
 		local _, isVisible = Camera:WorldToViewportPoint(plr.Character.PrimaryPart.Position)
 
-		warn(type(plr), typeof(plr))
 		local PlayerDot =
 			DrawCircle(1, playercolorfunc(utilities, RadarESP.Library, plr, isVisible, "Box", "Outline"), 3, true, 1)
 
@@ -98,7 +95,7 @@ task.defer(function()
 					and char.PrimaryPart ~= nil
 					and char:FindFirstChildOfClass("Humanoid").Health > 0
 				then
-					local hum = char:FindFirstChildOfClass("Humanoid")
+					local _hum = char:FindFirstChildOfClass("Humanoid")
 					local scale = RadarESP.Library.Settings.Radar.Scale
 					local relx, rely = GetRelative(char.PrimaryPart.Position)
 					local newpos = RadarESP.Library.Settings.Radar.Position - Vector2.new(relx * scale, rely * scale)
@@ -147,14 +144,15 @@ task.defer(function()
 	end
 
 	local function NewLocalDot()
-		local d = drawingfunc("Triangle")
-		d.Visible = true
-		d.Thickness = 1
-		d.Filled = true
-		d.Color = playercolorfunc(RadarESP.Library, LocalPlayer, true, "Box", "Outline")
-		d.PointA = RadarESP.Library.Settings.Radar.Position + Vector2.new(0, -6)
-		d.PointB = RadarESP.Library.Settings.Radar.Position + Vector2.new(-3, 6)
-		d.PointC = RadarESP.Library.Settings.Radar.Position + Vector2.new(3, 6)
+		local d = drawer.new("Triangle", {
+			Visible = true,
+			Thickness = 1,
+			Filled = true,
+			Color = playercolorfunc(RadarESP.Library, LocalPlayer, true, "Box", "Outline"),
+			PointA = RadarESP.Library.Settings.Radar.Position + Vector2.new(0, -6),
+			PointB = RadarESP.Library.Settings.Radar.Position + Vector2.new(-3, 6),
+			PointC = RadarESP.Library.Settings.Radar.Position + Vector2.new(3, 6),
+		})
 		coroutine.wrap(function()
 			RunService.RenderStepped:Connect(function()
 				d.Visible = true
@@ -185,8 +183,15 @@ task.defer(function()
 		local _, isVisible = Camera:WorldToViewportPoint(pos)
 
 		local helper = { Neutral = true }
-		local ObjectDot =
-			DrawCircle(1, playercolorfunc(utilities, RadarESP.Library, helper, isVisible, "Box", "Outline"), 3, true, 1)
+		local ObjectDot = drawer.new("Square", {
+			Transparency = 1,
+			Color = playercolorfunc(utilities, RadarESP.Library, helper, isVisible, "Box", "Outline"),
+			Visible = false,
+			Thickness = 1,
+			Position = Vector2.new(0, 0),
+			Size = Vector2.new(6, 6),
+			Filled = true,
+		})
 
 		local function Update()
 			local c
@@ -200,16 +205,16 @@ task.defer(function()
 						(newpos - RadarESP.Library.Settings.Radar.Position).magnitude
 						< RadarESP.Library.Settings.Radar.Radius - 2
 					then
-						ObjectDot.Radius = 3
-						ObjectDot.Position = newpos
+						ObjectDot.Size = Vector2.new(6, 6)
+						ObjectDot.Position = newpos - Vector2.new(3, 3)
 						ObjectDot.Visible = true
 					else
 						local dist = (RadarESP.Library.Settings.Radar.Position - newpos).magnitude
 						local calc = (RadarESP.Library.Settings.Radar.Position - newpos).unit
 							* (dist - RadarESP.Library.Settings.Radar.Radius)
 						local inside = Vector2.new(newpos.X + calc.X, newpos.Y + calc.Y)
-						ObjectDot.Radius = 2
-						ObjectDot.Position = inside
+						ObjectDot.Size = Vector2.new(4, 4)
+						ObjectDot.Position = inside - Vector2.new(2, 2)
 						ObjectDot.Visible = true
 					end
 
@@ -252,11 +257,12 @@ task.defer(function()
 			RadarBorder.Radius = RadarESP.Library.Settings.Radar.Radius
 			RadarBorder.Color = RadarESP.Library.Settings.currentColors.Radar.Border
 
-			RadarBorder.Visible = true
-			RadarBackground.Visible = true
 			if not RadarESP.Library.Settings.Radar.Enabled then
 				RadarBorder.Visible = false
 				RadarBackground.Visible = false
+			else
+				RadarBorder.Visible = true
+				RadarBackground.Visible = true
 			end
 		end)
 	end)()

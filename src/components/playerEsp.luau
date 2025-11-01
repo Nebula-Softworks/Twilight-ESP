@@ -5,14 +5,10 @@
 
 ]=]
 
-local services = require("@root/utilities/services")
 local utilities = require("@root/utilities")
+local drawer = require("@root/utilities/drawer")
 
-local Players = services.Players
-local RunService = services.RunService
-local UserInputService = services.UserInputService
 local Camera = workspace.CurrentCamera
-local LocalPlayer = Players.LocalPlayer
 
 local playerEsp = {}
 local tracerorigin = utilities.GetTracerOrigin
@@ -23,14 +19,14 @@ function playerEsp:CreateESP(Library, Player)
 	local teamType = playertype(utilities, Player)
 
 	local box = {
-		TopLeft = Drawing.new("Line"),
-		TopRight = Drawing.new("Line"),
-		BottomLeft = Drawing.new("Line"),
-		BottomRight = Drawing.new("Line"),
-		Left = Drawing.new("Line"),
-		Right = Drawing.new("Line"),
-		Top = Drawing.new("Line"),
-		Bottom = Drawing.new("Line"),
+		TopLeft = drawer.new("Line"),
+		TopRight = drawer.new("Line"),
+		BottomLeft = drawer.new("Line"),
+		BottomRight = drawer.new("Line"),
+		Left = drawer.new("Line"),
+		Right = drawer.new("Line"),
+		Top = drawer.new("Line"),
+		Bottom = drawer.new("Line"),
 	}
 
 	for _, line in pairs(box) do
@@ -39,16 +35,17 @@ function playerEsp:CreateESP(Library, Player)
 		line.Thickness = Library.Settings.Box.Thickness
 	end
 
-	local tracer = Drawing.new("Line")
-	tracer.Visible = false
-	tracer.Color = Library.Settings.currentColors[teamType].Tracer.Visible
-	tracer.Thickness = Library.Settings.Tracer.Thickness
-	tracer.From = tracerorigin(utilities, Library)
+	local tracer = drawer.new("Line", {
+		Visible = false,
+		Color = false,
+		Thickness = Library.Settings.Tracer.Thickness,
+		From = tracerorigin(utilities, Library),
+	})
 
 	local healthBar = {
-		Outline = Drawing.new("Square"),
-		Fill = Drawing.new("Square"),
-		Text = Drawing.new("Text"),
+		Outline = drawer.new("Square"),
+		Fill = drawer.new("Square"),
+		Text = drawer.new("Text"),
 	}
 
 	for _, obj in pairs(healthBar) do
@@ -86,8 +83,8 @@ function playerEsp:CreateESP(Library, Player)
 	end
 
 	local info = {
-		Name = Drawing.new("Text"),
-		Distance = Drawing.new("Text"),
+		Name = drawer.new("Text"),
+		Distance = drawer.new("Text"),
 	}
 
 	for _, text in pairs(info) do
@@ -99,10 +96,11 @@ function playerEsp:CreateESP(Library, Player)
 		text.Outline = true
 	end
 
-	local snapline = Drawing.new("Line")
-	snapline.Visible = false
-	snapline.Color = Library.Settings.currentColors[teamType].Box.Outline.Visible
-	snapline.Thickness = 1
+	local snapline = drawer.new("Line", {
+		Visible = false,
+		Color = Library.Settings.currentColors[teamType].Box.Outline.Visible,
+		Thickness = 1,
+	})
 
 	local highlight = Instance.new("Highlight")
 	highlight.FillColor = Library.Settings.currentColors[teamType].Chams.Fill.Visible
@@ -116,34 +114,34 @@ function playerEsp:CreateESP(Library, Player)
 
 	local skeleton = {
 		-- Spine & Head
-		Head = Drawing.new("Line"),
-		Neck = Drawing.new("Line"),
-		UpperSpine = Drawing.new("Line"),
-		LowerSpine = Drawing.new("Line"),
+		Head = drawer.new("Line"),
+		Neck = drawer.new("Line"),
+		UpperSpine = drawer.new("Line"),
+		LowerSpine = drawer.new("Line"),
 
 		-- Left Arm
-		LeftShoulder = Drawing.new("Line"),
-		LeftUpperArm = Drawing.new("Line"),
-		LeftLowerArm = Drawing.new("Line"),
-		LeftHand = Drawing.new("Line"),
+		LeftShoulder = drawer.new("Line"),
+		LeftUpperArm = drawer.new("Line"),
+		LeftLowerArm = drawer.new("Line"),
+		LeftHand = drawer.new("Line"),
 
 		-- Right Arm
-		RightShoulder = Drawing.new("Line"),
-		RightUpperArm = Drawing.new("Line"),
-		RightLowerArm = Drawing.new("Line"),
-		RightHand = Drawing.new("Line"),
+		RightShoulder = drawer.new("Line"),
+		RightUpperArm = drawer.new("Line"),
+		RightLowerArm = drawer.new("Line"),
+		RightHand = drawer.new("Line"),
 
 		-- Left Leg
-		LeftHip = Drawing.new("Line"),
-		LeftUpperLeg = Drawing.new("Line"),
-		LeftLowerLeg = Drawing.new("Line"),
-		LeftFoot = Drawing.new("Line"),
+		LeftHip = drawer.new("Line"),
+		LeftUpperLeg = drawer.new("Line"),
+		LeftLowerLeg = drawer.new("Line"),
+		LeftFoot = drawer.new("Line"),
 
 		-- Right Leg
-		RightHip = Drawing.new("Line"),
-		RightUpperLeg = Drawing.new("Line"),
-		RightLowerLeg = Drawing.new("Line"),
-		RightFoot = Drawing.new("Line"),
+		RightHip = drawer.new("Line"),
+		RightUpperLeg = drawer.new("Line"),
+		RightLowerLeg = drawer.new("Line"),
+		RightFoot = drawer.new("Line"),
 	}
 
 	for _, line in pairs(skeleton) do
@@ -262,8 +260,8 @@ function playerEsp:UpdateESP(Library, player)
 	end
 
 	-- Early screen check to hide all drawings if player is off screen
-	local _, isOnScreen = Camera:WorldToViewportPoint(rootPart.Position)
-	if not isOnScreen then
+	local pos, onScreen = Camera:WorldToViewportPoint(rootPart.Position)
+	if not onScreen then
 		for _, obj in pairs(esp.Box) do
 			obj.Visible = false
 		end
@@ -306,8 +304,6 @@ function playerEsp:UpdateESP(Library, player)
 		end
 		return
 	end
-
-	local pos, onScreen = Camera:WorldToViewportPoint(rootPart.Position)
 	local distance = (rootPart.Position - Camera.CFrame.Position).Magnitude
 
 	local isVisible = true
@@ -503,13 +499,13 @@ function playerEsp:UpdateESP(Library, player)
 
 			-- Connecting lines
 			local function drawConnectingLine(from, to, visible)
-				local line = Drawing.new("Line")
-				line.Visible = visible
-				line.Color = boxColor
-				line.Thickness = Library.Settings.Box.Thickness
-				line.From = from
-				line.To = to
-				return line
+				return drawer.new("Line", {
+					Visible = visible,
+					Color = boxColor,
+					Thickness = Library.Settings.Box.Thickness,
+					From = from,
+					To = to,
+				})
 			end
 			local function drawConnectingBox(a, b, c, d)
 				local function dot(u, v)
@@ -564,12 +560,13 @@ function playerEsp:UpdateESP(Library, player)
 				end
 
 				local from, to, thickness = faceCenterLine_and_thickness()
-				local quad = Drawing.new("Line")
-				quad.Transparency = Library.Settings.Box.Filled.Transparency
-				quad.Color = boxFillColor
-				quad.Thickness = thickness
-				quad.From = from
-				quad.To = to
+				local quad = drawer.new("Line", {
+					Transparency = Library.Settings.Box.Filled.Transparency,
+					Color = boxFillColor,
+					Thickness = thickness,
+					From = from,
+					To = to,
+				})
 
 				if Library.Settings.Box.Filled.Enabled then
 					quad.Visible = true
@@ -603,12 +600,13 @@ function playerEsp:UpdateESP(Library, player)
 			end)
 		else
 			local function drawConnectingBox(pointa, pointd)
-				local quad = Drawing.new("Square")
-				quad.Filled = true
-				quad.Transparency = Library.Settings.Box.Filled.Transparency
-				quad.Color = boxFillColor
-				quad.Position = pointa
-				quad.Size = pointd - pointa
+				local quad = drawer.new("Square", {
+					Filled = true,
+					Transparency = Library.Settings.Box.Filled.Transparency,
+					Color = boxFillColor,
+					Position = pointa,
+					Size = pointd - pointa,
+				})
 				if Library.Settings.Box.Filled.Enabled then
 					quad.Visible = true
 				else

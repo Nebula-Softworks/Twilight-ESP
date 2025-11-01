@@ -1,15 +1,10 @@
 local ObjectESP = {}
 ObjectESP.__index = ObjectESP
 
-local services = require("@root/utilities/services")
+local drawer = require("@root/utilities/drawer")
 local utilities = require("@root/utilities")
 
-local Players = services.Players
-local RunService = services.RunService
-local UserInputService = services.UserInputService
 local Camera = workspace.CurrentCamera
-local LocalPlayer = Players.LocalPlayer
-
 local tracerorigin = utilities.GetTracerOrigin
 local playercolorfunc = utilities.GetPlayerColor
 
@@ -17,14 +12,14 @@ function ObjectESP.CreateESP(Library, object, rootPart)
 	local teamType = "generic"
 
 	local box = {
-		TopLeft = Drawing.new("Line"),
-		TopRight = Drawing.new("Line"),
-		BottomLeft = Drawing.new("Line"),
-		BottomRight = Drawing.new("Line"),
-		Left = Drawing.new("Line"),
-		Right = Drawing.new("Line"),
-		Top = Drawing.new("Line"),
-		Bottom = Drawing.new("Line"),
+		TopLeft = drawer.new("Line"),
+		TopRight = drawer.new("Line"),
+		BottomLeft = drawer.new("Line"),
+		BottomRight = drawer.new("Line"),
+		Left = drawer.new("Line"),
+		Right = drawer.new("Line"),
+		Top = drawer.new("Line"),
+		Bottom = drawer.new("Line"),
 	}
 
 	for _, line in pairs(box) do
@@ -33,16 +28,17 @@ function ObjectESP.CreateESP(Library, object, rootPart)
 		line.Thickness = Library.Settings.Box.Thickness
 	end
 
-	local tracer = Drawing.new("Line")
-	tracer.Visible = false
-	tracer.Color = Library.Settings.currentColors[teamType].Tracer.Visible
-	tracer.Thickness = Library.Settings.Tracer.Thickness
-	tracer.From = tracerorigin(utilities, Library)
+	local tracer = drawer.new("Line", {
+		Visible = false,
+		Color = false,
+		Thickness = Library.Settings.Tracer.Thickness,
+		From = tracerorigin(utilities, Library),
+	})
 
 	local healthBar = {
-		Outline = Drawing.new("Square"),
-		Fill = Drawing.new("Square"),
-		Text = Drawing.new("Text"),
+		Outline = drawer.new("Square"),
+		Fill = drawer.new("Square"),
+		Text = drawer.new("Text"),
 	}
 
 	for _, obj in pairs(healthBar) do
@@ -80,8 +76,8 @@ function ObjectESP.CreateESP(Library, object, rootPart)
 	end
 
 	local info = {
-		Name = Drawing.new("Text"),
-		Distance = Drawing.new("Text"),
+		Name = drawer.new("Text"),
+		Distance = drawer.new("Text"),
 	}
 
 	for _, text in pairs(info) do
@@ -93,10 +89,11 @@ function ObjectESP.CreateESP(Library, object, rootPart)
 		text.Outline = true
 	end
 
-	local snapline = Drawing.new("Line")
-	snapline.Visible = false
-	snapline.Color = Library.Settings.currentColors[teamType].Box.Outline.Visible
-	snapline.Thickness = 1
+	local snapline = drawer.new("Line", {
+		Visible = false,
+		Color = Library.Settings.currentColors[teamType].Box.Outline.Visible,
+		Thickness = 1,
+	})
 
 	local highlight = Instance.new("Highlight")
 	highlight.FillColor = Library.Settings.currentColors[teamType].Chams.Fill.Visible
@@ -146,7 +143,7 @@ function ObjectESP:UpdateESP(Library)
 
 	local object = self.object
 	if not object then
-		-- Hide all drawings if character doesn't exist
+		-- Hide all drawers if character doesn't exist
 		for _, obj in pairs(esp.Box) do
 			obj.Visible = false
 		end
@@ -181,7 +178,7 @@ function ObjectESP:UpdateESP(Library)
 		return
 	end
 
-	-- Early screen check to hide all drawings if player is off screen
+	-- Early screen check to hide all drawers if player is off screen
 	local _, isOnScreen = Camera:WorldToViewportPoint(rootPart.Position)
 	if not isOnScreen then
 		for _, obj in pairs(esp.Box) do
@@ -399,35 +396,74 @@ function ObjectESP:UpdateESP(Library)
 
 			-- Connecting lines
 			local function drawConnectingLine(from, to, visible)
-				local line = Drawing.new("Line")
-				line.Visible = visible
-				line.Color = boxColor
-				line.Thickness = Library.Settings.Box.Thickness
-				line.From = from
-				line.To = to
-				return line
+				return drawer.new("Line", {
+					Visible = visible,
+					Color = boxColor,
+					Thickness = Library.Settings.Box.Thickness,
+					From = from,
+					To = to,
+				})
 			end
 			local function drawConnectingBox(a, b, c, d)
-				-- returns fromVec2, toVec2, thicknessNumber (pixels)
-				local function faceCenterLine_and_thickness(a, b, c, d)
-					local law = math.abs((b - a).X)
-					local lah = math.abs((b - a).Y)
-					local length = math.sqrt(law * law + lah * lah)
-					local law2 = math.abs((d - c).X)
-					local lah2 = math.abs((d - c).Y)
-					local length2 = math.sqrt(law2 * law2 + lah2 * lah2)
-					print(length == length2 and "YESSS MATH WORKS" or "fuck ts")
-
-					return (d - a) / 2 + a, (c - b) / 2 + b, length
+				local function dot(u, v)
+					return u.X * v.X + u.Y * v.Y
 				end
 
-				local from, to, thickness = faceCenterLine_and_thickness(a, b, c, d)
-				local quad = Drawing.new("Line")
-				quad.Transparency = Library.Settings.Box.Filled.Transparency
-				quad.Color = boxFillColor
-				quad.Thickness = thickness
-				quad.From = from
-				quad.To = to
+				local function length(v)
+					return math.sqrt(v.X * v.X + v.Y * v.Y)
+				end
+
+				local function normalize(v)
+					local l = length(v)
+					if l == 0 then
+						return Vector2.new(0, 0)
+					end
+					return Vector2.new(v.X / l, v.Y / l)
+				end
+
+				-- a: top-left, b: top-right, c: bottom-right, d: bottom-left (all Vector2 screen coords)
+				-- returns: from(Vector2), to(Vector2), thickness(number)
+				local function faceCenterLine_and_thickness()
+					-- width vector (top edge)
+					local widthVec = c - a
+					local wlen = length(widthVec)
+					if wlen == 0 then
+						-- degenerate top edge: fallback to small visible line between a and c
+						local fallbackFrom = (a + d) * 0.5
+						local fallbackTo = (b + c) * 0.5
+						return fallbackFrom, fallbackTo, 1
+					end
+
+					-- perpendicular normal to width, rotated 90 degrees (counter-clockwise)
+					local n = Vector2.new(-widthVec.Y, widthVec.X)
+					local nUnit = normalize(n)
+					if nUnit.X == 0 and nUnit.Y == 0 then
+						-- shouldn't happen because when > 0, but safe guard
+						return (a + d) * 0.5, (b + c) * 0.5, 1
+					end
+
+					-- perpendicular distances from top edge to bottom points projected onto normal
+					local distLeft = math.abs(dot(d - a, nUnit))
+					local distRight = math.abs(dot(b - c, nUnit))
+
+					-- average for stability (handles small skew/trapezoids)
+					local height = (distLeft + distRight) * 0.5
+
+					-- midpoints of left and right edges
+					local leftMid = (a + b) * 0.5
+					local rightMid = (d + c) * 0.5
+
+					return leftMid, rightMid, height
+				end
+
+				local from, to, thickness = faceCenterLine_and_thickness()
+				local quad = drawer.new("Line", {
+					Transparency = Library.Settings.Box.Filled.Transparency,
+					Color = boxFillColor,
+					Thickness = thickness,
+					From = from,
+					To = to,
+				})
 
 				if Library.Settings.Box.Filled.Enabled then
 					quad.Visible = true
@@ -454,19 +490,20 @@ function ObjectESP:UpdateESP(Library)
 			-- Clean up connecting lines and filled after frame
 			task.defer(function()
 				task.wait(Library.Settings.Framerate or 1 / 144)
-				for _, drawing in ipairs(connectors) do
-					pcall(drawing.Remove, drawing)
-					pcall(drawing.Destroy, drawing)
+				for _, drawer in ipairs(connectors) do
+					pcall(drawer.Remove, drawer)
+					pcall(drawer.Destroy, drawer)
 				end
 			end)
 		else
 			local function drawConnectingBox(pointa, pointd)
-				local quad = Drawing.new("Square")
-				quad.Filled = true
-				quad.Transparency = Library.Settings.Box.Filled.Transparency
-				quad.Color = boxFillColor
-				quad.Position = pointa
-				quad.Size = pointd - pointa
+				local quad = drawer.new("Square", {
+					Filled = true,
+					Transparency = Library.Settings.Box.Filled.Transparency,
+					Color = boxFillColor,
+					Position = pointa,
+					Size = pointd - pointa,
+				})
 				if Library.Settings.Box.Filled.Enabled then
 					quad.Visible = true
 				else
@@ -474,7 +511,6 @@ function ObjectESP:UpdateESP(Library)
 				end
 				return quad
 			end
-
 			local connectors = {
 				drawConnectingBox(boxPosition, boxPosition + Vector2.new(boxSize.X, boxSize.Y)),
 			}
@@ -536,9 +572,9 @@ function ObjectESP:UpdateESP(Library)
 			end
 			task.defer(function()
 				task.wait()
-				for _, drawing in ipairs(connectors) do
-					pcall(drawing.Remove, drawing)
-					pcall(drawing.Destroy, drawing)
+				for _, drawer in ipairs(connectors) do
+					pcall(drawer.Remove, drawer)
+					pcall(drawer.Destroy, drawer)
 				end
 			end)
 		end

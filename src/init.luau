@@ -5,9 +5,6 @@ local objectEsp = require("@root/components/objectEsp")
 
 local Players = services.Players
 local RunService = services.RunService
-local UserInputService = services.UserInputService
-local Camera = workspace.CurrentCamera
-local LocalPlayer = Players.LocalPlayer
 
 local Twilight = {
 	Settings = {

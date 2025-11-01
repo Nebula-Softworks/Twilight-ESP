@@ -45,9 +45,6 @@ end
 
 function functions:GetPlayerColor(root, Player, isVisible, part, additional)
 	local teamType
-	if type(Player) == "boolean" then
-		return Color3.new(1, 1, 1)
-	end
 	if Player.Neutral then
 		teamType = "generic"
 	else
