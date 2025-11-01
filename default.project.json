@@ -12,9 +12,11 @@
       }
     },
     
-    "StarterGui": {
-      "Twilight Test": {
-        "$path": "example.client.luau"
+    "StarterPlayer": {
+      "StarterPlayerScripts": {
+        "Twilight Test": {
+          "$path": "example.client.luau"
+        }
       }
     }
   }
