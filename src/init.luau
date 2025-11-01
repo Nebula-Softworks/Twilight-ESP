@@ -210,7 +210,7 @@ local Twilight = {
 					Invisible = Color3.new(1, 1, 1),
 				},
 			},
-			radar = {
+			Radar = {
 				Background = Color3.fromRGB(5, 5, 5),
 				Border = Color3.fromRGB(35, 35, 35),
 			},
@@ -305,7 +305,8 @@ local Twilight = {
 
 		Radar = {
 			Enabled = true,
-			Size = 100, -- Radius Of The Circle, Hence The Circle will be 200x200
+			Position = Vector2.new(workspace.CurrentCamera.ViewportSize.X - 120, 120),
+			Radius = 100, -- Radius Of The Circle, Hence The Circle will be 200x200
 			Scale = 1, -- Determinatant Factor on the effect of the relative pos for 2D replacement
 		},
 
@@ -337,6 +338,7 @@ local Twilight = {
 
 	_connections = {},
 }
+radarEsp:init(Twilight)
 
 function Twilight:Unload()
 	for _, player in ipairs(Players:GetPlayers()) do
@@ -486,6 +488,5 @@ table.insert(
 for _, player in ipairs(Players:GetPlayers()) do
 	playerEsp:CreateESP(Twilight, player)
 end
-radarEsp:init(Twilight)
 
 return Twilight
