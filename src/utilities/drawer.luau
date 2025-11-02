@@ -1,8 +1,8 @@
 local module = {}
 
-function module.New(objecttype: string, properties: {}): Drawing
+function module.new(objecttype: string, properties: {}): Drawing
 	local Object = Drawing.new(objecttype)
-	for property, value in pairs(properties) do
+	for property, value in pairs(properties or {}) do
 		Object[property] = value
 	end
 	return Object

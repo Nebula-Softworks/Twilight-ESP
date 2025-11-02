@@ -30,7 +30,7 @@ end
 task.defer(function()
 	repeat
 		task.wait()
-	until LocalPlayer.Character ~= nil and LocalPlayer.Character.PrimaryPart ~= nil and RadarESP.Library
+	until LocalPlayer.Character ~= nil and LocalPlayer.Character.HumanoidRootPart ~= nil and RadarESP.Library
 
 	-- I am creating a function this way as I wont have to set the properties every time
 	local function DrawCircle(Transparency, Color, Radius, Filled, Thickness)
@@ -68,8 +68,8 @@ task.defer(function()
 
 	local function GetRelative(pos)
 		local char = LocalPlayer.Character
-		if char ~= nil and char.PrimaryPart ~= nil then
-			local pmpart = char.PrimaryPart
+		if char ~= nil and char.HumanoidRootPart ~= nil then
+			local pmpart = char.HumanoidRootPart
 			local camerapos = Vector3.new(Camera.CFrame.Position.X, pmpart.Position.Y, Camera.CFrame.Position.Z)
 			local newcf = CFrame.new(pmpart.Position, camerapos)
 			local r = newcf:PointToObjectSpace(pos)
@@ -80,7 +80,8 @@ task.defer(function()
 	end
 
 	local function PlaceDot(plr)
-		local _, isVisible = Camera:WorldToViewportPoint(plr.Character.PrimaryPart.Position)
+		plr.CharacterAdded:Wait()
+		local _, isVisible = Camera:WorldToViewportPoint(plr.Character.HumanoidRootPart.Position)
 
 		local PlayerDot =
 			DrawCircle(1, playercolorfunc(utilities, RadarESP.Library, plr, isVisible, "Box", "Outline"), 3, true, 1)
@@ -92,12 +93,12 @@ task.defer(function()
 				if
 					char
 					and char:FindFirstChildOfClass("Humanoid")
-					and char.PrimaryPart ~= nil
+					and char.HumanoidRootPart ~= nil
 					and char:FindFirstChildOfClass("Humanoid").Health > 0
 				then
 					local _hum = char:FindFirstChildOfClass("Humanoid")
 					local scale = RadarESP.Library.Settings.Radar.Scale
-					local relx, rely = GetRelative(char.PrimaryPart.Position)
+					local relx, rely = GetRelative(char.HumanoidRootPart.Position)
 					local newpos = RadarESP.Library.Settings.Radar.Position - Vector2.new(relx * scale, rely * scale)
 
 					if
@@ -148,7 +149,7 @@ task.defer(function()
 			Visible = true,
 			Thickness = 1,
 			Filled = true,
-			Color = playercolorfunc(RadarESP.Library, LocalPlayer, true, "Box", "Outline"),
+			Color = playercolorfunc(utilities, RadarESP.Library, LocalPlayer, true, "Box", "Outline"),
 			PointA = RadarESP.Library.Settings.Radar.Position + Vector2.new(0, -6),
 			PointB = RadarESP.Library.Settings.Radar.Position + Vector2.new(-3, 6),
 			PointC = RadarESP.Library.Settings.Radar.Position + Vector2.new(3, 6),
@@ -168,6 +169,7 @@ task.defer(function()
 
 	Players.PlayerAdded:Connect(function(v)
 		if v ~= LocalPlayer then
+			v.CharacterAdded:Wait()
 			PlaceDot(v)
 		end
 		pcall(LocalPlayerDot.Destroy, LocalPlayerDot)
