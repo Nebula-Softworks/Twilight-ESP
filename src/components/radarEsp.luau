@@ -133,6 +133,8 @@ task.defer(function()
 					end
 				end
 			end)
+
+			table.insert(RadarESP.Library._connections, c)
 		end
 		coroutine.wrap(Update)()
 	end
@@ -144,6 +146,7 @@ task.defer(function()
 		end
 	end
 
+	local currentlocaldotc = nil
 	local function NewLocalDot()
 		local d = drawer.new("Triangle", {
 			Visible = true,
@@ -154,28 +157,36 @@ task.defer(function()
 			PointB = RadarESP.Library.Settings.Radar.Position + Vector2.new(-3, 6),
 			PointC = RadarESP.Library.Settings.Radar.Position + Vector2.new(3, 6),
 		})
+
 		coroutine.wrap(function()
-			RunService.RenderStepped:Connect(function()
+			if currentlocaldotc then
+				currentlocaldotc:Disconnect()
+			end
+			currentlocaldotc = RunService.RenderStepped:Connect(function()
 				d.Visible = true
 				if not RadarESP.Library.Settings.Radar.Enabled then
 					d.Visible = false
 				end
 			end)
+			RadarESP.Library._connections.currentlocaldotc = currentlocaldotc
 		end)()
 		return d
 	end
 
 	local LocalPlayerDot = NewLocalDot()
 
-	Players.PlayerAdded:Connect(function(v)
-		if v ~= LocalPlayer then
-			v.CharacterAdded:Wait()
-			PlaceDot(v)
-		end
-		pcall(LocalPlayerDot.Destroy, LocalPlayerDot)
-		pcall(LocalPlayerDot.Remove, LocalPlayerDot)
-		LocalPlayerDot = NewLocalDot()
-	end)
+	table.insert(
+		RadarESP.Library._connections,
+		Players.PlayerAdded:Connect(function(v)
+			if v ~= LocalPlayer then
+				v.CharacterAdded:Wait()
+				PlaceDot(v)
+			end
+			pcall(LocalPlayerDot.Destroy, LocalPlayerDot)
+			pcall(LocalPlayerDot.Remove, LocalPlayerDot)
+			LocalPlayerDot = NewLocalDot()
+		end)
+	)
 
 	function RadarESP:PlaceObjectDot(object)
 		table.insert(RadarESP.ExistingESPs, object)
@@ -234,6 +245,7 @@ task.defer(function()
 					c:Disconnect()
 				end
 			end)
+			table.insert(RadarESP.Library._connections, c)
 		end
 		coroutine.wrap(Update)()
 	end
@@ -267,6 +279,7 @@ task.defer(function()
 				RadarBackground.Visible = true
 			end
 		end)
+		table.insert(RadarESP.Library._connections, c)
 	end)()
 end)
 

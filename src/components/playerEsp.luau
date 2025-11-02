@@ -6,8 +6,10 @@
 ]=]
 
 local utilities = require("@root/utilities")
+local services = require("@root/utilities/services")
 local drawer = require("@root/utilities/drawer")
 
+local Players = services.Players
 local Camera = workspace.CurrentCamera
 
 local playerEsp = {}
