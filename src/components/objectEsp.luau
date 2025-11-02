@@ -30,7 +30,6 @@ function ObjectESP.CreateESP(Library, object, rootPart)
 
 	local tracer = drawer.new("Line", {
 		Visible = false,
-		Color = false,
 		Thickness = Library.Settings.Tracer.Thickness,
 		From = tracerorigin(utilities, Library),
 	})
