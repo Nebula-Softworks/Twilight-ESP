@@ -779,6 +779,18 @@ function playerEsp:UpdateESP(Library, player)
 	else
 		esp.Info.Name.Visible = false
 	end
+	if Library.Settings.Distance.Enabled[teamType] then
+		local distformatted = distance
+		if Library.Settings.Distance.DistanceUnit == 2 then
+			distformatted = tonumber(distance) * 0.28
+		end
+		esp.Info.Name.Text = tostring(distformatted)
+		esp.Info.Name.Position = Vector2.new(boxPosition.X + boxWidth / 2, boxPosition.Y + boxSize.Y)
+		esp.Info.Name.Color = textColor
+		esp.Info.Name.Visible = true
+	else
+		esp.Info.Name.Visible = false
+	end
 
 	if Library.Settings.Snaplines then
 		esp.Snapline.From = Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y)

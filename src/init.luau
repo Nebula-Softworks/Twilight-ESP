@@ -224,12 +224,12 @@ local Twilight = {
 			Bar = false,
 			Text = false,
 
-			Position = 1, -- 1 - left, 2 - right
+			Position = 1,
 			Suffix = "HP",
 		},
 
 		Box = {
-			Style = 1, -- 1 Corners, 2 Box, 3 3D, maybe in future ill add quad (oriented box)
+			Style = 1,
 			Enabled = false,
 			Filled = {
 				Enabled = false,
@@ -244,8 +244,8 @@ local Twilight = {
 				friendly = false,
 				generic = false,
 			},
-			Origin = 1, -- 1 Local HRP, 2 Bottom Viewport, 3 Top Viewport, 4 Center Viewport, 5 Mouse
-			Style = 1, -- 1 Line
+			Origin = 1,
+			Style = 1,
 			Thickness = 1, --px
 		},
 
@@ -257,7 +257,7 @@ local Twilight = {
 				generic = false,
 			},
 
-			Style = 1, -- 1 Display Name, 2 User Name
+			Style = 1,
 		},
 		Distance = {
 			Enabled = {
@@ -266,7 +266,7 @@ local Twilight = {
 				["local"] = false,
 				generic = false,
 			},
-			DistanceUnit = 1, -- 1 studs, 2 meters
+			DistanceUnit = 1,
 		},
 
 		Chams = {
@@ -278,7 +278,7 @@ local Twilight = {
 			},
 			Outline = {
 				Enabled = true,
-				Thickness = 0.1, --px
+				Thickness = 0.1,
 				Transparency = 0,
 			},
 			Fill = {
@@ -297,7 +297,7 @@ local Twilight = {
 			},
 			Thickness = 1, --px
 			Transparency = 1,
-			ExplicitBodyType = nil, -- 1 R15, 2 R6. But not required as the esp will auto detect body types
+			ExplicitBodyType = nil,
 		},
 
 		Radar = {
@@ -334,6 +334,39 @@ local Twilight = {
 	Highlights = {},
 
 	_connections = {},
+
+	Enums = {
+		HealthBarPosition = {
+			Left = 1,
+			Right = 2,
+		},
+		BoxStyle = {
+			CornerBoxes = 1,
+			Normal = 2,
+			["3D"] = 3,
+			Quad = 4,
+		},
+		TracerOrigin = {
+			LocalHumanoid = 1,
+			Mouse = 5,
+			Viewports = {
+				Bottom = 2,
+				Top = 3,
+				Center = 4,
+			},
+		},
+		TracerStyle = {
+			Line = 1,
+		},
+		NameStyle = {
+			Username = 1,
+			DisplayName = 2,
+		},
+		DistanceUnit = {
+			Studs = 1,
+			Meters = 2,
+		},
+	},
 }
 radarEsp:init(Twilight)
 
