@@ -84,66 +84,74 @@ task.defer(function()
 	end
 
 	local function PlaceDot(plr)
-		repeat
-			task.wait()
-		until plr.Character
-		local _, isVisible = Camera:WorldToViewportPoint(plr.Character.HumanoidRootPart.Position)
+		task.defer(function()
+			repeat
+				task.wait()
+			until plr.Character
+			local _, isVisible = Camera:WorldToViewportPoint(plr.Character.HumanoidRootPart.Position)
 
-		local PlayerDot =
-			DrawCircle(1, playercolorfunc(utilities, RadarESP.Library, plr, isVisible, "Box", "Outline"), 3, true, 1)
+			local PlayerDot = DrawCircle(
+				1,
+				playercolorfunc(utilities, RadarESP.Library, plr, isVisible, "Box", "Outline"),
+				3,
+				true,
+				1
+			)
 
-		local function Update()
-			local c
-			c = RunService.RenderStepped:Connect(function()
-				local char = plr.Character
-				if
-					char
-					and char:FindFirstChildOfClass("Humanoid")
-					and char.HumanoidRootPart ~= nil
-					and char:FindFirstChildOfClass("Humanoid").Health > 0
-				then
-					local _hum = char:FindFirstChildOfClass("Humanoid")
-					local scale = RadarESP.Library.Settings.Radar.Scale
-					local relx, rely = GetRelative(char.HumanoidRootPart.Position)
-					local newpos = RadarESP.Library.Settings.Radar.Position - Vector2.new(relx * scale, rely * scale)
-
+			local function Update()
+				local c
+				c = RunService.RenderStepped:Connect(function()
+					local char = plr.Character
 					if
-						(newpos - RadarESP.Library.Settings.Radar.Position).magnitude
-						< RadarESP.Library.Settings.Radar.Radius - 2
+						char
+						and char:FindFirstChildOfClass("Humanoid")
+						and char.HumanoidRootPart ~= nil
+						and char:FindFirstChildOfClass("Humanoid").Health > 0
 					then
-						PlayerDot.Radius = 3
-						PlayerDot.Position = newpos
+						local _hum = char:FindFirstChildOfClass("Humanoid")
+						local scale = RadarESP.Library.Settings.Radar.Scale
+						local relx, rely = GetRelative(char.HumanoidRootPart.Position)
+						local newpos = RadarESP.Library.Settings.Radar.Position
+							- Vector2.new(relx * scale, rely * scale)
+
+						if
+							(newpos - RadarESP.Library.Settings.Radar.Position).magnitude
+							< RadarESP.Library.Settings.Radar.Radius - 2
+						then
+							PlayerDot.Radius = 3
+							PlayerDot.Position = newpos
+							PlayerDot.Visible = true
+						else
+							local dist = (RadarESP.Library.Settings.Radar.Position - newpos).magnitude
+							local calc = (RadarESP.Library.Settings.Radar.Position - newpos).unit
+								* (dist - RadarESP.Library.Settings.Radar.Radius)
+							local inside = Vector2.new(newpos.X + calc.X, newpos.Y + calc.Y)
+							PlayerDot.Radius = 2
+							PlayerDot.Position = inside
+							PlayerDot.Visible = true
+						end
+
+						PlayerDot.Color = playercolorfunc(utilities, RadarESP.Library, plr, isVisible, "Box", "Outline")
+
 						PlayerDot.Visible = true
+						if not RadarESP.Library.Settings.Radar.Enabled then
+							PlayerDot.Visible = false
+						end
 					else
-						local dist = (RadarESP.Library.Settings.Radar.Position - newpos).magnitude
-						local calc = (RadarESP.Library.Settings.Radar.Position - newpos).unit
-							* (dist - RadarESP.Library.Settings.Radar.Radius)
-						local inside = Vector2.new(newpos.X + calc.X, newpos.Y + calc.Y)
-						PlayerDot.Radius = 2
-						PlayerDot.Position = inside
-						PlayerDot.Visible = true
-					end
-
-					PlayerDot.Color = playercolorfunc(utilities, RadarESP.Library, plr, isVisible, "Box", "Outline")
-
-					PlayerDot.Visible = true
-					if not RadarESP.Library.Settings.Radar.Enabled then
 						PlayerDot.Visible = false
+						if Players:FindFirstChild(plr.Name) == nil then
+							pcall(PlayerDot.Destroy, PlayerDot)
+							pcall(PlayerDot.Remove, PlayerDot)
+							c:Disconnect()
+							c = nil
+						end
 					end
-				else
-					PlayerDot.Visible = false
-					if Players:FindFirstChild(plr.Name) == nil then
-						pcall(PlayerDot.Destroy, PlayerDot)
-						pcall(PlayerDot.Remove, PlayerDot)
-						c:Disconnect()
-						c = nil
-					end
-				end
-			end)
+				end)
 
-			table.insert(RadarESP.Library._connections, c)
-		end
-		coroutine.wrap(Update)()
+				table.insert(RadarESP.Library._connections, c)
+			end
+			coroutine.wrap(Update)()
+		end)
 	end
 
 	for _, v in pairs(Players:GetChildren()) do
@@ -186,7 +194,6 @@ task.defer(function()
 		RadarESP.Library._connections,
 		Players.PlayerAdded:Connect(function(v)
 			if v ~= LocalPlayer then
-				v.CharacterAdded:Wait()
 				PlaceDot(v)
 			end
 			pcall(LocalPlayerDot.Destroy, LocalPlayerDot)

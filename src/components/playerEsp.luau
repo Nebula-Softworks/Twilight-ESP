@@ -49,39 +49,41 @@ function playerEsp:CreateESP(Library, Player)
 		Text = drawer.new("Text"),
 	}
 
-	for _, obj in pairs(healthBar) do
-		obj.Visible = false
-		local healthtype
-		repeat
-			task.wait()
-		until Player.Character
-		local humanoid = Player.Character:FindFirstChild("Humanoid")
-		if humanoid then
-			if humanoid.Health / humanoid.MaxHealth > 60 / 100 then
-				healthtype = "High"
-			elseif humanoid.Health / humanoid.MaxHealth > 20 / 100 then
-				healthtype = "Medium"
+	task.defer(function()
+		for _, obj in pairs(healthBar) do
+			obj.Visible = false
+			local healthtype
+			repeat
+				task.wait()
+			until Player.Character
+			local humanoid = Player.Character:FindFirstChild("Humanoid")
+			if humanoid then
+				if humanoid.Health / humanoid.MaxHealth > 60 / 100 then
+					healthtype = "High"
+				elseif humanoid.Health / humanoid.MaxHealth > 20 / 100 then
+					healthtype = "Medium"
+				else
+					healthtype = "Low"
+				end
 			else
-				healthtype = "Low"
+				healthtype = "High"
 			end
-		else
-			healthtype = "High"
+			if not Library.Settings.currentColors[teamType].HealthBar then
+				continue
+			end
+			if obj == healthBar.Fill then
+				obj.Color = Library.Settings.currentColors[teamType].HealthBar.Fills[healthtype]
+				obj.Filled = true
+			elseif obj == healthBar.Text then
+				obj.Center = true
+				obj.Size = Library.Settings.TextSize
+				obj.Color = Library.Settings.currentColors[teamType].HealthBar.Fills[healthtype]
+				obj.Font = 2
+			else
+				obj.Filled = false
+			end
 		end
-		if not Library.Settings.currentColors[teamType].HealthBar then
-			continue
-		end
-		if obj == healthBar.Fill then
-			obj.Color = Library.Settings.currentColors[teamType].HealthBar.Fills[healthtype]
-			obj.Filled = true
-		elseif obj == healthBar.Text then
-			obj.Center = true
-			obj.Size = Library.Settings.TextSize
-			obj.Color = Library.Settings.currentColors[teamType].HealthBar.Fills[healthtype]
-			obj.Font = 2
-		else
-			obj.Filled = false
-		end
-	end
+	end)
 
 	local info = {
 		Name = drawer.new("Text"),
