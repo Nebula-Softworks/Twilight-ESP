@@ -782,11 +782,13 @@ function playerEsp:UpdateESP(Library, player)
 		esp.Info.Name.Visible = false
 	end
 	if Library.Settings.Distance.Enabled[teamType] then
-		local distformatted = distance
+		local distformatted = tonumber(distance)
 		if Library.Settings.Distance.DistanceUnit == 2 then
-			distformatted = tonumber(distance) * 0.28
+			distformatted = distance * 0.28
 		end
-		esp.Info.Name.Text = tostring(distformatted)
+		esp.Info.Name.Text = tostring(math.round(distformatted * 10) / 10)
+			.. " "
+			.. (Library.Settings.Distance.DistanceUnit == 2 and "meters" or "studs")
 		esp.Info.Name.Position = Vector2.new(boxPosition.X + boxWidth / 2, boxPosition.Y + boxSize.Y)
 		esp.Info.Name.Color = textColor
 		esp.Info.Name.Visible = true
@@ -822,7 +824,7 @@ function playerEsp:UpdateESP(Library, player)
 	end
 
 	if Library.Settings.Skeleton.Enabled[teamType] then
-		local function getBonePositions(character)
+		local function getBonePositions()
 			if not character then
 				return nil
 			end

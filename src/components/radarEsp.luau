@@ -8,8 +8,11 @@ local drawer = require("@root/utilities/drawer")
 
 local Players = services.Players
 local RunService = services.RunService
+local UserInputService = services.UserInputService
+local GuiService = services.GuiService
 local Camera = workspace.CurrentCamera
 local LocalPlayer = Players.LocalPlayer
+local Mouse = LocalPlayer:GetMouse()
 
 local playercolorfunc = utilities.GetPlayerColor
 
@@ -43,6 +46,7 @@ task.defer(function()
 			Radius = Radius,
 			NumSides = math.clamp(Radius * 55 / 100, 10, 75),
 			Filled = Filled,
+			ZIndex = 5,
 		})
 	end
 
@@ -80,7 +84,9 @@ task.defer(function()
 	end
 
 	local function PlaceDot(plr)
-		plr.CharacterAdded:Wait()
+		repeat
+			task.wait()
+		until plr.Character
 		local _, isVisible = Camera:WorldToViewportPoint(plr.Character.HumanoidRootPart.Position)
 
 		local PlayerDot =
@@ -130,6 +136,7 @@ task.defer(function()
 						pcall(PlayerDot.Destroy, PlayerDot)
 						pcall(PlayerDot.Remove, PlayerDot)
 						c:Disconnect()
+						c = nil
 					end
 				end
 			end)
@@ -140,7 +147,6 @@ task.defer(function()
 	end
 
 	for _, v in pairs(Players:GetChildren()) do
-		print(typeof(v))
 		if v ~= LocalPlayer then
 			PlaceDot(v)
 		end
@@ -156,6 +162,7 @@ task.defer(function()
 			PointA = RadarESP.Library.Settings.Radar.Position + Vector2.new(0, -6),
 			PointB = RadarESP.Library.Settings.Radar.Position + Vector2.new(-3, 6),
 			PointC = RadarESP.Library.Settings.Radar.Position + Vector2.new(3, 6),
+			ZIndex = 5,
 		})
 
 		coroutine.wrap(function()
@@ -204,6 +211,7 @@ task.defer(function()
 			Position = Vector2.new(0, 0),
 			Size = Vector2.new(6, 6),
 			Filled = true,
+			ZIndex = 5,
 		})
 
 		local function Update()
@@ -249,6 +257,37 @@ task.defer(function()
 		end
 		coroutine.wrap(Update)()
 	end
+
+	local inset = GuiService:GetGuiInset()
+
+	local dragging = false
+	local offset = Vector2.new(0, 0)
+	UserInputService.InputBegan:Connect(function(input)
+		if
+			input.UserInputType == Enum.UserInputType.MouseButton1
+			and (Vector2.new(Mouse.X, Mouse.Y + inset.Y) - RadarESP.Library.Settings.Radar.Position).magnitude
+				< RadarESP.Library.Settings.Radar.Radius
+		then
+			offset = RadarESP.Library.Settings.Radar.Position - Vector2.new(Mouse.X, Mouse.Y)
+			dragging = true
+		end
+	end)
+
+	UserInputService.InputEnded:Connect(function(input)
+		if input.UserInputType == Enum.UserInputType.MouseButton1 then
+			dragging = false
+		end
+	end)
+
+	coroutine.wrap(function()
+		local c
+		c = RunService.RenderStepped:Connect(function()
+			if dragging then
+				RadarESP.Library.Settings.Radar.Position = Vector2.new(Mouse.X, Mouse.Y) + offset
+			end
+		end)
+		table.insert(RadarESP.Library._connections, c)
+	end)()
 
 	-- Loop
 	coroutine.wrap(function()
