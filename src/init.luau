@@ -8,20 +8,20 @@ local RunService = services.RunService
 
 local Twilight = {
 	Settings = {
-		-- Generic is anything not in a team, including external/custom objects bounded to an ESP instance
 
+		-- Generic is anything not in a team, including external/custom objects bounded to an ESP instance
 		Enabled = false,
 		ObjectsEnabled = false,
 
 		Checks = {
 			Visible = {
-				Enabled = false,
-				OnlyVisible = false,
+				Enabled = false, -- required for the next 2 checks
+				OnlyVisible = false, -- makes it show only visible players
 				Recolor = false, -- enable visible and invisible variations of colours.
 			},
 			Team = {
-				Enabled = false,
-				SelectedTeams = {
+				Enabled = false, -- whether team check will be enabled. required for SelectedTeams
+				SelectedTeams = { -- if TeamCheck is enabled, only the following teams with 'true' will be enabled root-ly
 					enemy = false,
 					friendly = false,
 					generic = false,
@@ -30,6 +30,7 @@ local Twilight = {
 			},
 		},
 
+		-- Team, Category, Property, Invisible and Visible Variations - Visible is default used if recoloring is turned off
 		currentColors = {
 			generic = {
 				Box = {
@@ -214,67 +215,67 @@ local Twilight = {
 		},
 
 		HealthBar = {
-			Enabled = {
+			Enabled = { -- enabled for what variations
 				enemy = false,
 				friendly = false,
 				["local"] = false,
 				generic = false,
 			},
 
-			Source = function(plr)
+			Source = function(plr) -- health source/where the library will get health properties from. Arsenal Support. Use Enum HealthSource
 				return plr.Character.Humanoid
 			end,
 
-			Bar = false,
-			Text = false,
+			Bar = false, -- Display The Bar
+			Text = false, -- Display The Health as text
 
-			Position = 1,
-			Suffix = "HP",
+			Position = 1, -- Position of the bar and text. Use Enum HealthBarPosition
+			Suffix = "HP", -- Trailing Text for HP Text
 		},
 
 		Box = {
-			Style = 1,
+			Style = 1, -- Style of Box. Use Enum BoxStyle
 			Enabled = false,
 			Filled = {
 				Enabled = false,
 				Transparency = 0.6,
 			},
-			Thickness = 1,
+			Thickness = 1, -- in pixels
 		},
 
 		Tracer = {
-			Enabled = {
+			Enabled = { -- enabled for what variations
 				enemy = false,
 				friendly = false,
 				generic = false,
 			},
-			Origin = 1,
-			Style = 1,
+			Origin = 1, -- Tracer Origin. Use Enum TracerOrigin. Can be Local HRP, Following Mouse, Center, Top or Bottom
+			Style = 1, -- Tracer Style. Use Enum TracerStyle
 			Thickness = 1, --px
 		},
 
 		Name = {
-			Enabled = {
+			Enabled = { -- enabled for what variations
 				enemy = false,
 				friendly = false,
 				["local"] = false,
 				generic = false,
 			},
 
-			Style = 1,
+			Style = 1, -- Which Name Source To Use. Use Enum NameStyle.
 		},
 		Distance = {
-			Enabled = {
+			Enabled = { -- enabled for what variations
 				enemy = false,
 				friendly = false,
 				["local"] = false,
 				generic = false,
 			},
-			DistanceUnit = 1,
+			DistanceUnit = 1, -- Unit Of Measurement. Use Enum DistanceUnit
 		},
 
 		Chams = {
-			Enabled = {
+			Enabled = { -- enabled for what variations
 				enemy = false,
 				friendly = false,
 				["local"] = false,
@@ -289,11 +290,11 @@ local Twilight = {
 				Enabled = true,
 				Transparency = 0.5,
 			},
-			Occlusion = false,
+			Occlusion = false, -- whether the highlight/cham will not show through walls.
 		},
 
 		Skeleton = {
-			Enabled = {
+			Enabled = { -- enabled for what variations
 				enemy = false,
 				friendly = false,
 				["local"] = false,
@@ -301,7 +302,7 @@ local Twilight = {
 			},
 			Thickness = 1, --px
 			Transparency = 1,
-			ExplicitBodyType = nil,
+			ExplicitBodyType = nil, -- Explicitly set what type of skeleton should be shown. Not working atm. Use Enum SkeletonBodyType.
 		},
 
 		Radar = {
@@ -312,10 +313,10 @@ local Twilight = {
 		},
 
 		TextSize = 14,
-		MaxDistance = 2000, -- studs
+		MaxDistance = 2000, -- Measured in studs
 		RefreshRate = 1 / 120,
 
-		Snaplines = true,
+		Snaplines = true, -- deprecated and removed mid development in favor of tracers. will be removed here soon.
 	},
 
 	Drawings = {
@@ -329,15 +330,12 @@ local Twilight = {
 		Radar = {},
 		Skeleton = {},
 	},
+	Highlights = {},
 
 	ObjectESPs = {
 		Highlights = {},
 		ESPs = {},
 	},
-
-	Highlights = {},
-
-	_connections = {},
 
 	Enums = {
 		HealthBarPosition = {
@@ -378,7 +376,13 @@ local Twilight = {
 			Studs = 1,
 			Meters = 2,
 		},
+		SkeletonBodyType = {
+			Dynamic = nil,
+			["R6"] = 1,
+			["R15"] = 2,
+		},
 	},
+	_connections = {},
 }
 radarEsp:init(Twilight)
 
