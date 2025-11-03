@@ -56,7 +56,7 @@ function playerEsp:CreateESP(Library, Player)
 			repeat
 				task.wait()
 			until Player.Character
-			local humanoid = Player.Character:FindFirstChild("Humanoid")
+			local humanoid = Library.Settings.HealthBar.Source(Player)
 			if humanoid then
 				if humanoid.Health / humanoid.MaxHealth > 60 / 100 then
 					healthtype = "High"

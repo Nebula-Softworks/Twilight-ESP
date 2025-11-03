@@ -221,6 +221,10 @@ local Twilight = {
 				generic = false,
 			},
 
+			Source = function(plr)
+				return plr.Character.Humanoid
+			end,
+
 			Bar = false,
 			Text = false,
 
@@ -339,6 +343,14 @@ local Twilight = {
 		HealthBarPosition = {
 			Left = 1,
 			Right = 2,
+		},
+		HealthSource = {
+			NRPBS = function(plr)
+				return plr.NRPBS -- arsenal support
+			end,
+			Humanoid = function(plr)
+				return plr.Character.Humanoid
+			end,
 		},
 		BoxStyle = {
 			CornerBoxes = 1,
