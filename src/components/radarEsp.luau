@@ -2,9 +2,10 @@ local RadarESP = {}
 
 RadarESP.EspObjects = {}
 RadarESP.ExistingESPs = {}
-local services = require("@root/utilities/services")
-local utilities = require("@root/utilities")
-local drawer = require("@root/utilities/drawer")
+local services = require("../utilities/services")
+local utilities = require("../utilities")
+local drawer = require("../utilities/drawer")
+local types = require("../types")
 
 local Players = services.Players
 local RunService = services.RunService
@@ -16,11 +17,11 @@ local Mouse = LocalPlayer:GetMouse()
 
 local playercolorfunc = utilities.GetPlayerColor
 
-function RadarESP:init(Library)
+function RadarESP:init(Library: types.TwilightLibrary)
 	RadarESP:updateobjectlist(Library)
 	RadarESP.Library = Library
 end
-function RadarESP:updateobjectlist(Library)
+function RadarESP:updateobjectlist(Library: types.TwilightLibrary)
 	RadarESP.EspObjects = {}
 	for Object, _ in pairs(Library.ObjectESPs.ESPs) do
 		table.insert(RadarESP.EspObjects, Object)

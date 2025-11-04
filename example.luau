@@ -1,3 +1,5 @@
+-- WHEN UR REWRITING THIS MAKE THE DEFAULT TRANSPARENCY 1
+
 getgenv().NoAnticheatPresent = false -- chams are super-duper detected. enabling this means there is no anticheat present, and will allow chams to run. if there is one present, you will probably get banned straight away as it is using a simple Highlight as of version 1.0
 getgenv().InterfaceName = "Twilight ESP Example"
 local Twilight = loadstring(game:HttpGet("https://raw.nebulasoftworks.xyz/twilight"))()

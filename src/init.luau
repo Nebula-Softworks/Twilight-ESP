@@ -1,7 +1,9 @@
-local services = require("@root/utilities/services")
-local playerEsp = require("@root/components/playerEsp")
-local radarEsp = require("@root/components/radarEsp")
-local objectEsp = require("@root/components/objectEsp")
+local services = require("@self/utilities/services")
+local playerEsp = require("@self/components/playerEsp")
+local radarEsp = require("@self/components/radarEsp")
+local objectEsp = require("@self/components/objectEsp")
+
+local types = require("@self/types")
 
 local Players = services.Players
 local RunService = services.RunService
@@ -75,7 +77,7 @@ local Twilight = {
 					Visible = Color3.new(1, 1, 1),
 					Invisible = Color3.new(1, 1, 1),
 				},
-			},
+			} :: types.TwilightColorSet,
 			friendly = {
 				Box = {
 					Outline = {
@@ -119,7 +121,7 @@ local Twilight = {
 					Visible = Color3.new(1, 1, 1),
 					Invisible = Color3.new(1, 1, 1),
 				},
-			},
+			} :: types.TwilightColorSet,
 			enemy = {
 				Box = {
 					Outline = {
@@ -163,7 +165,7 @@ local Twilight = {
 					Visible = Color3.new(1, 1, 1),
 					Invisible = Color3.new(1, 1, 1),
 				},
-			},
+			} :: types.TwilightColorSet,
 			["local"] = {
 				Box = {
 					Outline = {
@@ -207,12 +209,12 @@ local Twilight = {
 					Visible = Color3.new(1, 1, 1),
 					Invisible = Color3.new(1, 1, 1),
 				},
-			},
+			} :: types.TwilightColorSet,
 			Radar = {
 				Background = Color3.fromRGB(5, 5, 5),
 				Border = Color3.fromRGB(35, 35, 35),
 			},
-		},
+		} :: types.TwilightColors,
 
 		HealthBar = {
 			Enabled = { -- enabled for what variations
@@ -317,7 +319,7 @@ local Twilight = {
 		RefreshRate = 1 / 120,
 
 		Snaplines = true, -- deprecated and removed mid development in favor of tracers. will be removed here soon.
-	},
+	} :: types.TwilightSettings,
 
 	Drawings = {
 		ESP = {},
@@ -381,9 +383,9 @@ local Twilight = {
 			["R6"] = 1,
 			["R15"] = 2,
 		},
-	},
+	} :: types.TwilightEnums,
 	_connections = {},
-}
+} :: types.TwilightLibrary
 radarEsp:init(Twilight)
 
 function Twilight:Unload()

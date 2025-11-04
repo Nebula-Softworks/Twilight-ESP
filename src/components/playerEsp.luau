@@ -5,9 +5,10 @@
 
 ]=]
 
-local utilities = require("@root/utilities")
-local services = require("@root/utilities/services")
-local drawer = require("@root/utilities/drawer")
+local utilities = require("../utilities")
+local types = require("../types")
+local services = require("../utilities/services")
+local drawer = require("../utilities/drawer")
 
 local Players = services.Players
 local Camera = workspace.CurrentCamera
@@ -17,7 +18,7 @@ local tracerorigin = utilities.GetTracerOrigin
 local playertype = utilities.GetPlayerType
 local playercolorfunc = utilities.GetPlayerColor
 
-function playerEsp:CreateESP(Library, Player)
+function playerEsp:CreateESP(Library: types.TwilightLibrary, Player)
 	local teamType = playertype(utilities, Player)
 
 	local box = {
@@ -166,7 +167,7 @@ function playerEsp:CreateESP(Library, Player)
 	}
 end
 
-function playerEsp:RemoveESP(Library, Player)
+function playerEsp:RemoveESP(Library: types.TwilightLibrary, Player)
 	local esp = Library.Drawings.ESP[Player]
 	if esp then
 		for _, obj in pairs(esp.Box) do
@@ -208,7 +209,7 @@ function playerEsp:RemoveESP(Library, Player)
 	end
 end
 
-function playerEsp:UpdateESP(Library, player)
+function playerEsp:UpdateESP(Library: types.TwilightLibrary, player)
 	if not Library.Settings.Enabled then
 		return
 	end

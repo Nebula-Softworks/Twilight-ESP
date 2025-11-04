@@ -1,4 +1,4 @@
-local services = require("@root/utilities/services")
+local services = require("./utilities/services")
 
 local Players = services.Players
 local UserInputService = services.UserInputService

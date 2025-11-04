@@ -1,14 +1,15 @@
 local ObjectESP = {}
 ObjectESP.__index = ObjectESP
 
-local drawer = require("@root/utilities/drawer")
-local utilities = require("@root/utilities")
+local types = require("../types")
+local drawer = require("../utilities/drawer")
+local utilities = require("../utilities")
 
 local Camera = workspace.CurrentCamera
 local tracerorigin = utilities.GetTracerOrigin
 local playercolorfunc = utilities.GetPlayerColor
 
-function ObjectESP.CreateESP(Library, object, rootPart)
+function ObjectESP.CreateESP(Library: types.TwilightLibrary, object, rootPart)
 	local teamType = "generic"
 
 	local box = {
@@ -129,7 +130,7 @@ function ObjectESP.CreateESP(Library, object, rootPart)
 	return self
 end
 
-function ObjectESP:UpdateESP(Library)
+function ObjectESP:UpdateESP(Library: types.TwilightLibrary)
 	if not Library.Settings.ObjectsEnabled then
 		print("not enabled")
 		return
@@ -714,7 +715,7 @@ function ObjectESP:UpdateESP(Library)
 	end
 end
 
-function ObjectESP:RemoveESP(Library)
+function ObjectESP:RemoveESP(Library: types.TwilightLibrary)
 	local esp = self
 	if esp then
 		for _, obj in pairs(esp.Box) do
