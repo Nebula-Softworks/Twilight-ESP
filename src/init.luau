@@ -539,13 +539,14 @@ end
 
 local function kwarigfy(defaults, passed)
 	defaults = defaults or {}
+	passed = passed or {}
 	for i, v in pairs(defaults) do
 		if type(v) == "table" then
 			passed[i] = kwarigfy(v, passed[i] or {})
-			continue
-		end
-		if passed[i] == nil then
-			passed[i] = v
+		else
+			if passed[i] == nil then
+				passed[i] = v
+			end
 		end
 	end
 	return passed
