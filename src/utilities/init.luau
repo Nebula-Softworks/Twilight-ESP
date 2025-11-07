@@ -120,15 +120,4 @@ function functions:GetBoxCorners(cf, size)
 	return corners
 end
 
-function functions:Kwargify(defaults, passed)
-	defaults = defaults or {}
-	passed = passed or {}
-	for i, v in pairs(defaults) do
-		if passed[i] == nil then
-			passed[i] = v
-		end
-	end
-	return passed -- incase smth went wrong
-end
-
 return functions

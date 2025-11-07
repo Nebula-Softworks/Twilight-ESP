@@ -303,7 +303,7 @@ local Twilight = {
 				generic = false,
 			},
 			Thickness = 1, --px
-			Transparency = 1,
+			Transparency = 0,
 			ExplicitBodyType = nil, -- Explicitly set what type of skeleton should be shown. Not working atm. Use Enum SkeletonBodyType.
 		},
 
@@ -535,6 +535,26 @@ table.insert(
 
 for _, player in ipairs(Players:GetPlayers()) do
 	playerEsp:CreateESP(Twilight, player)
+end
+
+local function kwarigfy(defaults, passed)
+	defaults = defaults or {}
+	for i, v in pairs(defaults) do
+		if type(v) == "table" then
+			passed[i] = kwarigfy(v, passed[i] or {})
+			continue
+		end
+		if passed[i] == nil then
+			passed[i] = v
+		end
+	end
+	return passed
+end
+
+function Twilight:SetOptions(options: types.TwilightSettings)
+	options = options or {}
+	local currentOptions = Twilight.Settings
+	Twilight.Settings = kwarigfy(currentOptions, options)
 end
 
 return Twilight
