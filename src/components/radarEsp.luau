@@ -37,7 +37,7 @@ task.defer(function()
 	until LocalPlayer.Character ~= nil and LocalPlayer.Character.HumanoidRootPart ~= nil and RadarESP.Library
 
 	-- I am creating a function this way as I wont have to set the properties every time
-	local function DrawCircle(Transparency, Color, Radius, Filled, Thickness)
+	local function DrawCircle(Transparency, Color, Radius, Filled, Thickness, ZIndex)
 		return drawer.new("Circle", {
 			Transparency = Transparency,
 			Color = Color,
@@ -47,7 +47,7 @@ task.defer(function()
 			Radius = Radius,
 			NumSides = math.clamp(Radius * 55 / 100, 10, 75),
 			Filled = Filled,
-			ZIndex = 5,
+			ZIndex = ZIndex or 5,
 		})
 	end
 
@@ -56,7 +56,8 @@ task.defer(function()
 		RadarESP.Library.Settings.currentColors.Radar.Background,
 		RadarESP.Library.Settings.Radar.Radius,
 		true,
-		1
+		1,
+		4
 	)
 	RadarBackground.Visible = true
 	RadarBackground.Position = RadarESP.Library.Settings.Radar.Position
@@ -66,7 +67,8 @@ task.defer(function()
 		RadarESP.Library.Settings.currentColors.Radar.Border,
 		RadarESP.Library.Settings.Radar.Radius,
 		false,
-		3
+		3,
+		4
 	)
 	RadarBorder.Visible = true
 	RadarBorder.Position = RadarESP.Library.Settings.Radar.Position

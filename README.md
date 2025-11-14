@@ -42,6 +42,8 @@ After completing the first 3 steps, run `pnpm dev-server` instead of building. W
 In addition, the code will be generated with much more readable content, allowing for easier debugging.  
 Replace your URL for HttpGet with `http://localhost:8642/dist/main.luau` - if you have changed the port, change it here as well.  
   
+> You can replace all of the pnpm commands with npm run if you know what you are doing and do not wish to use pnpm.  
+  
 
 ## Credits
 Nebula Softworks - Design And Programming  

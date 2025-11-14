@@ -202,7 +202,7 @@ export type TwilightColorSet = {
 	},
 	Skeleton: TwilightColorItem,
 }
-type TwilightColorItem = {
+export type TwilightColorItem = {
 	Invisible: Color3,
 	Visible: Color3,
 }
@@ -250,9 +250,9 @@ export type TwilightEnums = {
 }
 
 -- Enum Types
-type NRPBStype = { MaxHealth: number, Health: number }
+type NRPBS = { MaxHealth: number, Health: number, [any]: any }
 type HealthBarPosition = number
-type HealthSource = ((Player) -> Humanoid) | ((Player) -> NRPBStype)
+type HealthSource = ((Player) -> Humanoid) | ((Player) -> NRPBS)
 type BoxStyle = number
 type TracerOrigin = number
 type TracerStyle = number
