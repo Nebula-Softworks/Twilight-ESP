@@ -1,6 +1,6 @@
 --// Functions
 local function cast(service: string): any
-	return game:GetService(service)
+	return cloneref and cloneref(game:GetService(service)) or game:GetService(service)
 end
 
 --// Initialize

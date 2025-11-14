@@ -7,3 +7,12 @@
 
 #auto-generated files
 sourcemap.json
+pnpm-lock.yaml
+src/wally.lock
+
+# editor generated stuff
+.vscode
+
+# project generated folders
+node_modules
+dist

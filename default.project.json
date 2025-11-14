@@ -5,7 +5,18 @@
 
     "ReplicatedStorage": {
       "Twilight ESP": {
-        "$path": "src"
+        "$path" : "src"
+      },
+      "TwilightBundled": {
+        "$path" : "dist/Twilight.ESP.luau"
+      }
+    },
+    
+    "StarterPlayer": {
+      "StarterPlayerScripts": {
+        "Twilight Test": {
+          "$path": "example.client.luau"
+        }
       }
     }
   }
