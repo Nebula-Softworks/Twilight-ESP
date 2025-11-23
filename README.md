@@ -11,10 +11,24 @@ It looks good. I can probably count with my fingers how many ESP Libraries as po
 So Start using Twilight, the extrasensory star, today.  
   
 ## Preview
-|||
-|--- | ---|
-| ![preview](/assets/previews/normal%20settings.png) | ![preview2](/assets/previews/3d%20showcase.png) |
-| ![preview](/assets/previews/arsenal%20gameplay%201.png) | ![preview2](/assets/previews/arsenal%20gameplay%202.png) |
+<table style="table-layout:fixed; width:100%;">
+  <tr>
+    <td align="center" width="50%">
+      <img src="/assets/previews/normal%20settings.png" style="max-height:500px; height:auto;">
+    </td>
+    <td align="center" width="50%">
+      <img src="/assets/previews/3d%20showcase.png" style="max-height:500px; height:auto;">
+    </td>
+  </tr>
+  <tr>
+    <td align="center" width="50%">
+      <img src="/assets/previews/arsenal%20gameplay%201.png" style="max-height:500px; height:auto;">
+    </td>
+    <td align="center" width="50%">
+      <img src="/assets/previews/arsenal%20gameplay%202.png" style="max-height:500px; height:auto;">
+    </td>
+  </tr>
+</table>
   
 
 ## Structure Of Twilight
