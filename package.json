@@ -1,6 +1,6 @@
 {
   "name": "twilight-esp",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "The Extrasensory Star",
   "main": "src/init.luau",
   "scripts": {

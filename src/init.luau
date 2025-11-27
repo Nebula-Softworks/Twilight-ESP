@@ -224,8 +224,8 @@ local Twilight = {
 				generic = false,
 			},
 
-			Source = function(plr) -- health source/where the library will get health properties from. Arsenal Support. Use Enum HealthSource
-				return plr.Character.Humanoid
+			Source = function(plr, value) -- health source/where the library will get health properties from. Arsenal Support. Use Enum HealthSource
+				return plr.Character.Humanoid[value]
 			end,
 
 			Bar = false, -- Display The Bar
@@ -345,11 +345,11 @@ local Twilight = {
 			Right = 2,
 		},
 		HealthSource = {
-			NRPBS = function(plr)
-				return plr.NRPBS -- arsenal support
+			NRPBS = function(a, b)
+				return a.NRPBS and a.NRPBS[b].Value -- arsenal support
 			end,
-			Humanoid = function(plr)
-				return plr.Character.Humanoid
+			Humanoid = function(a, b)
+				return a.Character.Humanoid and a.Character.Humanoid[b] or 100
 			end,
 		},
 		BoxStyle = {

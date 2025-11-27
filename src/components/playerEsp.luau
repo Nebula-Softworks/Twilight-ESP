@@ -57,17 +57,14 @@ function playerEsp:CreateESP(Library: types.TwilightLibrary, Player)
 			repeat
 				task.wait()
 			until Player.Character
-			local humanoid = Library.Settings.HealthBar.Source(Player)
-			if humanoid then
-				if humanoid.Health / humanoid.MaxHealth > 60 / 100 then
-					healthtype = "High"
-				elseif humanoid.Health / humanoid.MaxHealth > 20 / 100 then
-					healthtype = "Medium"
-				else
-					healthtype = "Low"
-				end
-			else
+			local health = Library.Settings.HealthBar.Source(Player, "Health")
+			local maxHealth = Library.Settings.HealthBar.Source(Player, "MaxHealth")
+			if health / maxHealth > 60 / 100 then
 				healthtype = "High"
+			elseif health / maxHealth > 20 / 100 then
+				healthtype = "Medium"
+			else
+				healthtype = "Low"
 			end
 			if not Library.Settings.currentColors[teamType].HealthBar then
 				continue
@@ -430,8 +427,9 @@ function playerEsp:UpdateESP(Library: types.TwilightLibrary, player)
 	local size = character:GetExtentsSize()
 	local cf = rootPart.CFrame
 
-	local top, top_onscreen = Camera:WorldToViewportPoint(cf * CFrame.new(0, size.Y / 2, 0).Position)
-	local bottom, bottom_onscreen = Camera:WorldToViewportPoint(cf * CFrame.new(0, -size.Y / 2, 0).Position)
+	local _, top_onscreen = Camera:WorldToViewportPoint(cf * CFrame.new(0, size.Y / 2, 0).Position)
+	local _, bottom_onscreen = Camera:WorldToViewportPoint(cf * CFrame.new(0, -size.Y / 2, 0).Position)
+	local cfpos = Camera:WorldToViewportPoint(cf)
 
 	if not top_onscreen or not bottom_onscreen then
 		for _, obj in pairs(esp.Box) do
@@ -440,10 +438,11 @@ function playerEsp:UpdateESP(Library: types.TwilightLibrary, player)
 		return
 	end
 
-	local screenSize = bottom.Y - top.Y
-	local boxWidth = screenSize * 0.65
-	local boxPosition = Vector2.new(top.X - boxWidth / 2, top.Y)
-	local boxSize = Vector2.new(boxWidth, screenSize)
+	local scale = 1 / (cfpos.Z * math.tan(math.rad(Camera.FieldOfView / 2)) * 2) * 1000
+	local boxWidth, boxHeight = math.floor(4.5 * scale), math.floor(6 * scale)
+	local x, y = math.floor(cfpos.X), math.floor(cfpos.Y)
+	local boxPosition = Vector2.new(math.floor(x - boxWidth / 2), math.floor((y - boxHeight / 2) + (scale / 2)))
+	local boxSize = Vector2.new(boxWidth, boxHeight)
 
 	-- Hide all box parts by default
 	for _, obj in pairs(esp.Box) do
@@ -744,9 +743,12 @@ function playerEsp:UpdateESP(Library: types.TwilightLibrary, player)
 		local maxHealth = humanoid.MaxHealth
 		local healthPercent = health / maxHealth
 
-		local barHeight = screenSize * 0.8
+		local barHeight = boxSize.Y
 		local barWidth = 4
-		local barPos = Vector2.new(boxPosition.X - barWidth - 2, boxPosition.Y + (screenSize - barHeight) / 2)
+
+		local barPosX = Library.Settings.HealthBar.Position == 1 and (boxPosition.X - barWidth - 2)
+			or (boxPosition.X + barWidth + 2 + boxSize.X)
+		local barPos = Vector2.new(barPosX, boxPosition.Y)
 
 		if Library.Settings.HealthBar.Bar then
 			esp.HealthBar.Outline.Size = Vector2.new(barWidth, barHeight)
@@ -755,7 +757,7 @@ function playerEsp:UpdateESP(Library: types.TwilightLibrary, player)
 			esp.HealthBar.Outline.Color = healthOutlineColor
 
 			esp.HealthBar.Fill.Size = Vector2.new(barWidth - 2, barHeight * healthPercent)
-			esp.HealthBar.Fill.Position = Vector2.new(barPos.X + 1, barPos.Y + barHeight * (1 - healthPercent))
+			esp.HealthBar.Fill.Position = Vector2.new(barPos.X + 1, barPos.Y + (barHeight * (1 - healthPercent)))
 			esp.HealthBar.Fill.Color = currentHealthColor
 			esp.HealthBar.Fill.Visible = true
 		else
