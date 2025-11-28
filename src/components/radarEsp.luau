@@ -75,7 +75,7 @@ task.defer(function()
 
 	local function GetRelative(pos)
 		local char = LocalPlayer.Character
-		if char ~= nil and char.HumanoidRootPart ~= nil then
+		if char and char:FindFirstChild("HumanoidRootPart") then
 			local pmpart = char.HumanoidRootPart
 			local camerapos = Vector3.new(Camera.CFrame.Position.X, pmpart.Position.Y, Camera.CFrame.Position.Z)
 			local newcf = CFrame.new(pmpart.Position, camerapos)
@@ -108,8 +108,8 @@ task.defer(function()
 					if
 						char
 						and char:FindFirstChildOfClass("Humanoid")
-						and char.HumanoidRootPart ~= nil
-						and char:FindFirstChildOfClass("Humanoid").Health > 0
+						and char:FindFirstChild("HumanoidRootPart")
+						and char:FindFirstChild("Humanoid").Health > 0
 					then
 						local _hum = char:FindFirstChildOfClass("Humanoid")
 						local scale = RadarESP.Library.Settings.Radar.Scale

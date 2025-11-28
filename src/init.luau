@@ -349,7 +349,7 @@ local Twilight = {
 				return a.NRPBS and a.NRPBS[b].Value -- arsenal support
 			end,
 			Humanoid = function(a, b)
-				return a.Character.Humanoid and a.Character.Humanoid[b] or 100
+				return a.Character:FindFirstChild("Humanoid") and a.Character.Humanoid[b] or 100
 			end,
 		},
 		BoxStyle = {

@@ -429,7 +429,7 @@ function playerEsp:UpdateESP(Library: types.TwilightLibrary, player)
 
 	local _, top_onscreen = Camera:WorldToViewportPoint(cf * CFrame.new(0, size.Y / 2, 0).Position)
 	local _, bottom_onscreen = Camera:WorldToViewportPoint(cf * CFrame.new(0, -size.Y / 2, 0).Position)
-	local cfpos = Camera:WorldToViewportPoint(cf)
+	local cfpos = Camera:WorldToViewportPoint(cf.Position)
 
 	if not top_onscreen or not bottom_onscreen then
 		for _, obj in pairs(esp.Box) do
@@ -746,8 +746,8 @@ function playerEsp:UpdateESP(Library: types.TwilightLibrary, player)
 		local barHeight = boxSize.Y
 		local barWidth = 4
 
-		local barPosX = Library.Settings.HealthBar.Position == 1 and (boxPosition.X - barWidth - 2)
-			or (boxPosition.X + barWidth + 2 + boxSize.X)
+		local barPosX = Library.Settings.HealthBar.Position == 1 and (boxPosition.X - barWidth - 4)
+			or (boxPosition.X + barWidth + 4 + boxSize.X)
 		local barPos = Vector2.new(barPosX, boxPosition.Y)
 
 		if Library.Settings.HealthBar.Bar then
@@ -756,8 +756,9 @@ function playerEsp:UpdateESP(Library: types.TwilightLibrary, player)
 			esp.HealthBar.Outline.Visible = true
 			esp.HealthBar.Outline.Color = healthOutlineColor
 
-			esp.HealthBar.Fill.Size = Vector2.new(barWidth - 2, barHeight * healthPercent)
-			esp.HealthBar.Fill.Position = Vector2.new(barPos.X + 1, barPos.Y + (barHeight * (1 - healthPercent)))
+			esp.HealthBar.Fill.Size = Vector2.new(barWidth - 2, (barHeight - 2) * healthPercent)
+			esp.HealthBar.Fill.Position =
+				Vector2.new(barPos.X + 1, barPos.Y + 1 + ((barHeight - 2) * (1 - healthPercent)))
 			esp.HealthBar.Fill.Color = currentHealthColor
 			esp.HealthBar.Fill.Visible = true
 		else
@@ -767,7 +768,7 @@ function playerEsp:UpdateESP(Library: types.TwilightLibrary, player)
 
 		if Library.Settings.HealthBar.Text then
 			esp.HealthBar.Text.Text = math.floor(health) .. Library.Settings.HealthBar.Suffix
-			esp.HealthBar.Text.Position = Vector2.new(barPos.X + barWidth + 2, barPos.Y + barHeight / 2)
+			esp.HealthBar.Text.Position = Vector2.new(barPos.X + barWidth + 2, barPos.Y + barHeight)
 			esp.HealthBar.Text.Visible = true
 		else
 			esp.HealthBar.Text.Visible = false
