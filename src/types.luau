@@ -1,42 +1,28 @@
+type DrawingTable = {
+	[any]: Drawing,
+}
+
 export type TwilightLibrary = {
 	Settings: TwilightSettings,
 
 	Drawings: {
-		ESP: {
-			[any]: any,
-		},
-		Tracers: {
-			[any]: any,
-		},
-		Boxes: {
-			[any]: any,
-		},
-		Healthbars: {
-			[any]: any,
-		},
-		Names: {
-			[any]: any,
-		},
-		Distances: {
-			[any]: any,
-		},
-		Snaplines: {
-			[any]: any,
-		},
-		Radar: {
-			[any]: any,
-		},
-		Skeleton: {
-			[any]: any,
-		},
+		ESP: DrawingTable,
+		Tracers: DrawingTable,
+		Boxes: DrawingTable,
+		Healthbars: DrawingTable,
+		Names: DrawingTable,
+		Distances: DrawingTable,
+		Snaplines: DrawingTable,
+		Radar: DrawingTable,
+		Skeleton: DrawingTable,
 	},
 	Highlights: {
-		[any]: any,
+		[any]: Highlight,
 	},
 
 	ObjectESPs: {
 		Highlights: {
-			[any]: any,
+			[any]: Highlight,
 		},
 		ESPs: {
 			[any]: any,
