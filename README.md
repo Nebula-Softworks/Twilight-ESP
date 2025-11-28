@@ -32,7 +32,7 @@ So Start using Twilight, the extrasensory star, today.
   
 
 ## Structure Of Twilight
-A semi-Rojo project made via modular Luau scripts, compiled for usage by Darklua and Lune. Semi-Rojo as it is used for Luau LSP and Selene Linter, but doesn't actually sync to Roblox.  
+A Rojo project made via modular Luau scripts, compiled for usage by Darklua and Lune.  
 As of Version 1.2, Twilight does not support usage outside of executors supporting the Drawing sUNC function.  
 Prior to Version 1.2, Twilight was compiled for usage with Maui by Latte Softworks.  
   
@@ -40,18 +40,23 @@ Prior to Version 1.2, Twilight was compiled for usage with Maui by Latte Softwor
 ## [Documentation](https://docs.nebulasoftworks.xyz/twilight)  
 > For Releases before Version 1.2, check the 1.1a Release's assets.  
   
-
-## How To Compile Your Changes?
+## Editing the project
+You can edit/modify the project for your personal use or to contribute to the Twilight Ecosystem.  
+If modifying for personal use, clone the repository to your local machine `git clone https://github.com/Nebula-Softworks/Twilight-ESP.git`.  
+This will save the entire repository onto your drive and you can edit it freely in your code editor.
+Feel free to commit changes, and modify the code to your liking.  
+If you are contributing, fork the repository instead on GitHub, then save it to your machine from the GitHub UI. You can edit the source, commit, and then create a pull request.    
+  
+### How To Compile Your Changes?
 > [!note]
 > You Will Need Performant Node Package Manager (pnpm) and Python
 
-First, clone the repo `git clone https://github.com/Nebula-Softworks/Twilight-ESP.git` if you have not already.  
 Open the repo in your VSC Workspace OR Open the repo in Powershell/Command Prompt.  
-Install the node_modules by running `pnpm install`.  
+Install the node_modules by running `pnpm install` if you have not.  
 Now, run `pnpm build`. Your changes will be bundled into the result at `dist/Twilight.ESP.luau` and `dist/Twilight.ESP.rbxm`.  
 View the `build` folder to see and edit how the code is generated, including the header paragraph etc.  
   
-### Using The Dev-Server Method
+#### Using The Dev-Server Method
 After completing the first 3 steps, run `pnpm dev-server` instead of building. Whenever you save changes, the dist/main.luau file will automatically update.  
 In addition, the code will be generated with much more readable content, allowing for easier debugging.  
 Replace your URL for HttpGet with `http://localhost:8642/dist/main.luau` - if you have changed the port, change it here as well.  
