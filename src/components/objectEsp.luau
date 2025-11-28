@@ -626,7 +626,10 @@ function ObjectESP:UpdateESP(Library: types.TwilightLibrary)
 		esp.Tracer.Visible = false
 	end
 
-	if Library.Settings.HealthBar.Enabled[teamType] then
+	if
+		Library.Settings.HealthBar.Enabled[teamType]
+		and Library.Settings.HealthBar.Source == Library.Enums.HealthSource.Humanoid
+	then
 		local health = humanoid.Health
 		local maxHealth = humanoid.MaxHealth
 		local healthPercent = health / maxHealth

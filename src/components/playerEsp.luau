@@ -739,8 +739,8 @@ function playerEsp:UpdateESP(Library: types.TwilightLibrary, player)
 	end
 
 	if Library.Settings.HealthBar.Enabled[teamType] then
-		local health = humanoid.Health
-		local maxHealth = humanoid.MaxHealth
+		local health = Library.Settings.HealthBar.Source(player, "Health")
+		local maxHealth = Library.Settings.HealthBar.Source(player, "MaxHealth")
 		local healthPercent = health / maxHealth
 
 		local barHeight = boxSize.Y
