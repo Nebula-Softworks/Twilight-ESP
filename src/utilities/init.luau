@@ -63,8 +63,8 @@ function functions:GetPlayerColor(root, Player, isVisible, part, additional)
 		if not Player.Character then
 			return
 		end
-		local maxHealth = Player.Character.Humanoid.MaxHealth
-		local currentHealth = Player.Character.Humanoid.Health
+		local currentHealth = root.Settings.HealthBar.Source(Player, "Health")
+		local maxHealth = root.Settings.HealthBar.Source(Player, "MaxHealth")
 		local currentStatus
 		if currentHealth / maxHealth > 65 / 100 then
 			currentStatus = "High"
