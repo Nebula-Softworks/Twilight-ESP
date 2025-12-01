@@ -426,81 +426,93 @@ function ObjectESP:UpdateESP(Library: types.TwilightLibrary)
 				})
 			end
 			local function drawConnectingBox(a, b, c, d, faceId)
-				-- BTW im only doing this shit super complicated-ly because some executors' Drawing library is trash.
-				-- They dont have filling for shapes (triangle and quad). Example is Solara.
-				-- If I could, i would have just used Filled Quads
-				local function dot(u, v)
-					return u.X * v.X + u.Y * v.Y
-				end
-
-				local function length(v)
-					return math.sqrt(v.X * v.X + v.Y * v.Y)
-				end
-
-				local function normalize(v)
-					local l = length(v)
-					if l == 0 then
-						return Vector2.new(0, 0)
-					end
-					return Vector2.new(v.X / l, v.Y / l)
-				end
-
-				-- a: top-left, b: top-right, c: bottom-right, d: bottom-left (all Vector2 screen coords)
-				-- returns: from(Vector2), to(Vector2), thickness(number)
-				local function faceCenterLine_and_thickness()
-					-- width vector (top edge)
-					local widthVec = c - a
-					local wlen = length(widthVec)
-					if wlen == 0 then
-						-- degenerate top edge: fallback to small visible line between a and c
-						local fallbackFrom = (a + d) * 0.5
-						local fallbackTo = (b + c) * 0.5
-						return fallbackFrom, fallbackTo, 1
+				if ((identifyexecutor and identifyexecutor()) or "") == "Solara" then
+					local function dot(u, v)
+						return u.X * v.X + u.Y * v.Y
 					end
 
-					-- perpendicular normal to width, rotated 90 degrees (counter-clockwise)
-					local n = Vector2.new(-widthVec.Y, widthVec.X)
-					local nUnit = normalize(n)
-					if nUnit.X == 0 and nUnit.Y == 0 then
-						-- shouldn't happen because when > 0, but safe guard
-						return (a + d) * 0.5, (b + c) * 0.5, 1
+					local function length(v)
+						return math.sqrt(v.X * v.X + v.Y * v.Y)
 					end
 
-					-- perpendicular distances from top edge to bottom points projected onto normal
-					local distLeft = math.abs(dot(d - a, nUnit))
-					local distRight = math.abs(dot(b - c, nUnit))
+					local function normalize(v)
+						local l = length(v)
+						if l == 0 then
+							return Vector2.new(0, 0)
+						end
+						return Vector2.new(v.X / l, v.Y / l)
+					end
 
-					-- average for stability (handles small skew/trapezoids)
-					local height = (distLeft + distRight) * 0.5
+					local function faceCenterLine_and_thickness()
+						local widthVec = c - a
+						local wlen = length(widthVec)
+						if wlen == 0 then
+							local fallbackFrom = (a + d) * 0.5
+							local fallbackTo = (b + c) * 0.5
+							return fallbackFrom, fallbackTo, 1
+						end
 
-					-- midpoints of left and right edges
-					local leftMid = (a + b) * 0.5
-					local rightMid = (d + c) * 0.5
+						local n = Vector2.new(-widthVec.Y, widthVec.X)
+						local nUnit = normalize(n)
+						if nUnit.X == 0 and nUnit.Y == 0 then
+							-- shouldn't happen because when > 0, but safe guard
+							return (a + d) * 0.5, (b + c) * 0.5, 1
+						end
 
-					return leftMid, rightMid, height
-				end
+						local distLeft = math.abs(dot(d - a, nUnit))
+						local distRight = math.abs(dot(b - c, nUnit))
 
-				local from, to, thickness = faceCenterLine_and_thickness()
-				local fills = esp.Fills or {}
-				local fillIndex = faceId
+						local height = (distLeft + distRight) * 0.5
 
-				local line
-				if fills[fillIndex] and fills[fillIndex].Position == nil then
-					line = fills[fillIndex]
+						local leftMid = (a + b) * 0.5
+						local rightMid = (d + c) * 0.5
+
+						return leftMid, rightMid, height
+					end
+
+					local from, to, thickness = faceCenterLine_and_thickness()
+					local fills = esp.Fills or {}
+					local fillIndex = faceId
+
+					local line
+					if fills[fillIndex] and fills[fillIndex].Position == nil then
+						line = fills[fillIndex]
+					else
+						line = drawer.new("Line")
+						fills[fillIndex] = line
+					end
+
+					line.Visible = isVisible and Library.Settings.Box.Filled.Enabled or false
+					line.Color = boxFillColor
+					line.Transparency = Library.Settings.Box.Filled.Transparency
+					line.Thickness = thickness
+					line.From = from
+					line.To = to
+
+					esp.Fills = fills
+					return line
 				else
-					line = drawer.new("Line")
-					fills[fillIndex] = line
+					local fills = esp.Fills or {}
+					local fillIndex = faceId
+
+					local quad = fills[fillIndex]
+					if not quad then
+						quad = drawer.new("Quad")
+						fills[fillIndex] = quad
+					end
+
+					quad.Visible = isVisible and Library.Settings.Box.Filled.Enabled or false
+					quad.Color = boxFillColor
+					quad.Transparency = Library.Settings.Box.Filled.Transparency
+					quad.Filled = true
+					quad.PointA = a
+					quad.PointB = b
+					quad.PointC = d
+					quad.PointD = c
+
+					esp.Fills = fills
+					return quad
 				end
-
-				line.Visible = isVisible and Library.Settings.Box.Filled.Enabled or false
-				line.Color = boxFillColor
-				line.Transparency = Library.Settings.Box.Filled.Transparency
-				line.Thickness = thickness
-				line.From = from
-				line.To = to
-
-				esp.Fills = fills
-				return line
 			end
 
 			drawConnectingBox(front.TL, front.TR, front.BL, front.BR, 1)
@@ -637,8 +649,8 @@ function ObjectESP:UpdateESP(Library: types.TwilightLibrary)
 		local barHeight = boxSize.Y
 		local barWidth = 4
 
-		local barPosX = Library.Settings.HealthBar.Position == 1 and (boxPosition.X - barWidth - 4)
-			or (boxPosition.X + barWidth + 4 + boxSize.X)
+		local barPosX = Library.Settings.HealthBar.Position == 1 and (boxPosition.X - barWidth - 6)
+			or (boxPosition.X + barWidth + 6 + boxSize.X)
 		local barPos = Vector2.new(barPosX, boxPosition.Y)
 
 		if Library.Settings.HealthBar.Bar then
@@ -683,14 +695,14 @@ function ObjectESP:UpdateESP(Library: types.TwilightLibrary)
 		if Library.Settings.Distance.DistanceUnit == 2 then
 			distformatted = distance * 0.28
 		end
-		esp.Info.Name.Text = tostring(math.round(distformatted * 10) / 10)
+		esp.Info.Distance.Text = tostring(math.round(distformatted * 10) / 10)
 			.. " "
 			.. (Library.Settings.Distance.DistanceUnit == 2 and "meters" or "studs")
-		esp.Info.Name.Position = Vector2.new(boxPosition.X + boxWidth / 2, boxPosition.Y + boxSize.Y)
-		esp.Info.Name.Color = textColor
-		esp.Info.Name.Visible = true
+		esp.Info.Distance.Position = Vector2.new(boxPosition.X + boxWidth / 2, boxPosition.Y + boxSize.Y)
+		esp.Info.Distance.Color = textColor
+		esp.Info.Distance.Visible = true
 	else
-		esp.Info.Name.Visible = false
+		esp.Info.Distance.Visible = false
 	end
 
 	if Library.Settings.Snaplines then
